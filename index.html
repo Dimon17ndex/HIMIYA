@@ -9,6 +9,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
   }
 
   html, body {
@@ -18,9 +19,11 @@
 
   body {
     background: #000;
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    color: #fff;
   }
 
-  /* ===== Градиентный фон (статичный, тёмный) ===== */
+  /* ===== Градиентный фон (нежное появление) ===== */
   .bg {
     position: fixed;
     inset: 0;
@@ -29,10 +32,83 @@
       radial-gradient(circle at 85% 70%, #161616 0%, transparent 50%),
       radial-gradient(circle at 50% 100%, #121212 0%, transparent 60%),
       linear-gradient(180deg, #0a0a0a 0%, #030303 100%);
+    opacity: 0;
+    transform: scale(1.05);
+    animation: bgAppear 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes bgAppear {
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* ===== Верхняя панель ===== */
+  .topbar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 20px 24px;
+    opacity: 0;
+    animation: fadeDown 1s ease-out 0.8s forwards;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Кнопка с тремя точками */
+  .dots-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .dots-btn:hover,
+  .dots-btn:active {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+  }
+
+  .dots-btn span {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0.85;
   }
 </style>
 </head>
 <body>
   <div class="bg"></div>
+
+  <div class="topbar">
+    <button class="dots-btn" onclick="openMenu()" aria-label="Меню">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+
+  <script>
+    function openMenu() {
+      console.log('Меню открыто');
+    }
+  </script>
 </body>
 </html>
