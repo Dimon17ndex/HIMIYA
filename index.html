@@ -36,34 +36,66 @@
   }
   @keyframes bgAppear { to { opacity: 1; transform: scale(1); } }
 
-  /* ===== Текст ХИМИЯ — увеличивается на месте ===== */
-  .title {
-    position: absolute;
-    top: 12vh;
-    left: 50%;
-    z-index: 1;
-    font-size: 4rem;
+  /* ===== 🔝 Блюрная вкладка сверху ===== */
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 22px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+    opacity: 0;
+    animation: fadeIn 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s forwards;
+  }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  /* Текст ХИМИЯ на вкладке */
+  .brand {
+    font-size: 1.15rem;
     font-weight: 900;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     background: linear-gradient(135deg, #ffffff 0%, #999999 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     user-select: none;
-
-    /* Начальное состояние: на своём месте, но маленький и прозрачный */
-    opacity: 0;
-    transform: translateX(-50%) scale(0.3);
-
-    animation: titleGrow 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
   }
 
-  @keyframes titleGrow {
-    to {
-      opacity: 1;
-      transform: translateX(-50%) scale(1);
-    }
+  /* Три точки */
+  .dots-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
   }
+
+  .dots-btn span {
+    display: block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    opacity: 0.9;
+    transition: all 0.25s ease;
+  }
+  .dots-btn:hover span,
+  .dots-btn:active span { opacity: 1; transform: scale(1.3); }
 
   /* ===== 🟦 4 блюрных блока ===== */
   .grid {
@@ -91,10 +123,10 @@
     animation: boxSlideUp 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
-  .box:nth-child(1) { animation-delay: 1.0s; }
-  .box:nth-child(2) { animation-delay: 1.15s; }
-  .box:nth-child(3) { animation-delay: 1.3s; }
-  .box:nth-child(4) { animation-delay: 1.45s; }
+  .box:nth-child(1) { animation-delay: 0.8s; }
+  .box:nth-child(2) { animation-delay: 0.95s; }
+  .box:nth-child(3) { animation-delay: 1.1s; }
+  .box:nth-child(4) { animation-delay: 1.25s; }
 
   @keyframes boxSlideUp {
     to {
@@ -107,59 +139,28 @@
   .box:active {
     background: rgba(255, 255, 255, 0.1);
   }
-
-  /* ===== Три точки ===== */
-  .dots-btn {
-    position: fixed;
-    top: 22px;
-    right: 20px;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 3px;
-    width: 20px;
-    height: 20px;
-    padding: 0;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    opacity: 0;
-    animation: fadeIn 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s forwards;
-  }
-  @keyframes fadeIn { to { opacity: 1; } }
-
-  .dots-btn span {
-    display: block;
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background: #e0e0e0;
-    opacity: 0.9;
-    transition: all 0.25s ease;
-  }
-  .dots-btn:hover span,
-  .dots-btn:active span { opacity: 1; transform: scale(1.3); }
 </style>
 </head>
 <body>
   <div class="bg"></div>
 
-  <h1 class="title">ХИМИЯ</h1>
+  <!-- 🔝 Вкладка с ХИМИЯ и тремя точками -->
+  <div class="topbar">
+    <div class="brand">ХИМИЯ</div>
+    <button class="dots-btn" onclick="openMenu()" aria-label="Меню">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
 
+  <!-- 🟦 4 блюрных блока -->
   <div class="grid">
     <div class="box"></div>
     <div class="box"></div>
     <div class="box"></div>
     <div class="box"></div>
   </div>
-
-  <button class="dots-btn" onclick="openMenu()" aria-label="Меню">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
 
   <script>
     function openMenu() { console.log('Меню открыто'); }
