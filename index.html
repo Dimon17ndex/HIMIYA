@@ -131,7 +131,7 @@
   }
   .canvas.show { opacity: 1; }
 
-    .molecule {
+  .molecule {
     position: absolute;
     top: 0;
     left: 0;
@@ -276,6 +276,9 @@
     let mouseX = -9999;
     let mouseY = -9999;
 
+    // 📱 Определяем мобильное устройство
+    const isMobile = window.innerWidth < 768;
+
     // 📐 Радиус видимой области
     const VIEW_RADIUS = () => {
       const w = window.innerWidth;
@@ -283,12 +286,13 @@
       return Math.sqrt((w / 2) ** 2 + (h / 2) ** 2);
     };
 
-    // 🎯 Плотность
-    const DENSITY = 0.000015;
+    // 🎯 Плотность — адаптивная
+    const DENSITY = isMobile ? 0.00010 : 0.000015;
 
     const targetCount = () => {
       const area = Math.PI * VIEW_RADIUS() ** 2 * 2.5;
-      return Math.max(8, Math.floor(area * DENSITY));
+      const minCount = isMobile ? 25 : 8;
+      return Math.max(minCount, Math.floor(area * DENSITY));
     };
 
     // 📏 Спавн за экраном
@@ -296,7 +300,8 @@
     const SPAWN_OUTER = () => VIEW_RADIUS() + 1100;
     const DESPAWN_RADIUS = () => VIEW_RADIUS() + 2200;
 
-    const MAX_PER_FRAME = 1;
+    // 🎬 Спавн быстрее на мобильных
+    const MAX_PER_FRAME = isMobile ? 4 : 1;
 
     // 🎈 Левитация
     const DRIFT_SPEED_MIN = 0.05;
@@ -395,7 +400,6 @@
       const shiftX = cx - (minX + maxX) / 2;
       const shiftY = cy - (minY + maxY) / 2;
 
-      // ✅ РЕАЛЬНЫЙ размер молекулы (без padding)
       const realW = maxX - minX;
       const realH = maxY - minY;
 
@@ -608,9 +612,8 @@
       mouseY = e.clientY;
     }
 
-    // 💡 Обводка ближайшей молекулы (по реальному размеру)
+    // 💡 Обводка ближайшей молекулы
     function updateHighlight() {
-      // Снимаем обводку со всех
       for (const m of molecules) {
         m.el.classList.remove('lit');
       }
@@ -625,11 +628,9 @@
       const maxDist = Math.sqrt((w / 2) ** 2 + (h / 2) ** 2);
 
       for (const m of molecules) {
-        // Центр молекулы на экране
         const cx = m.x + offsetX;
         const cy = m.y + offsetY;
 
-        // Масштаб молекулы по позиции
         const dxm = cx - w / 2;
         const dym = cy - h / 2;
         const distM = Math.sqrt(dxm * dxm + dym * dym);
@@ -639,15 +640,12 @@
         const tSmooth = Math.pow(tShifted, 1.0);
         const scale = SCALE_MIN + tSmooth * (SCALE_MAX - SCALE_MIN);
 
-        // ✅ РЕАЛЬНЫЙ размер молекулы (без padding!)
         const molW = m.realW * scale;
         const molH = m.realH * scale;
 
-        // Расстояние от курсора до центра молекулы
         const dx = mouseX - cx;
         const dy = mouseY - cy;
 
-        // ✅ Проверка по эллипсу — точно по контуру молекулы
         const nx = dx / (molW * 0.5);
         const ny = dy / (molH * 0.5);
         const ellipseDist = nx * nx + ny * ny;
@@ -682,8 +680,9 @@
     }
 
     function initCanvas() {
-      // 🎬 На старте заполняем только 40%
-      const initialCount = Math.max(3, Math.floor(targetCount() * 0.4));
+      // 🎬 На старте заполняем 40% (на мобильных 60%, чтобы быстрее было густо)
+      const initialRatio = isMobile ? 0.6 : 0.4;
+      const initialCount = Math.max(3, Math.floor(targetCount() * initialRatio));
       for (let i = 0; i < initialCount; i++) {
         createMolecule();
         const m = molecules[molecules.length - 1];
