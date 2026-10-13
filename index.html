@@ -2,13 +2,22 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>ХИМИЯ</title>
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23000000'/><text x='100' y='118' font-family='Arial,sans-serif' font-size='44' font-weight='900' fill='%23ffffff' text-anchor='middle' letter-spacing='1'>ХИМИЯ</text></svg>">
 
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+  }
 
   html, body {
     height: 100%;
@@ -33,7 +42,6 @@
     opacity: 1;
     transition: opacity 0.4s ease;
   }
-
   .loader.hide { opacity: 0; }
 
   .spinner {
@@ -44,10 +52,7 @@
     border-top-color: #ffffff;
     animation: spin 0.8s linear infinite;
   }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ===== 🎬 Тексты ===== */
   .intro-text {
@@ -64,45 +69,34 @@
     letter-spacing: 0.02em;
     font-size: 1.6rem;
     line-height: 1.3;
-
     pointer-events: none;
-
     opacity: 0;
     filter: blur(0);
     transform: translateY(-12px) scale(0.97);
     transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
   }
-
-  /* Появление */
   .intro-text.show {
     opacity: 1;
     filter: blur(0);
     transform: translateY(0) scale(1);
   }
-
-  /* Уход в блюр (смена) */
   .intro-text.blur-out {
     opacity: 0;
     filter: blur(14px);
     transform: scale(1.05);
     transition: opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease;
   }
-
-  /* Приход из блюра */
   .intro-text.blur-in {
     opacity: 0;
     filter: blur(14px);
     transform: scale(0.95);
   }
-
   .intro-text.blur-in.show {
     opacity: 1;
     filter: blur(0);
     transform: scale(1);
     transition: opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease;
   }
-
-  /* Быстрое исчезновение на месте через блюр */
   .intro-text.hide {
     opacity: 0;
     filter: blur(14px);
@@ -121,13 +115,50 @@
       linear-gradient(180deg, #0a0a0a 0%, #030303 100%);
   }
 
+  /* ===== 🌌 Поверхность ===== */
+  .canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    overflow: hidden;
+    cursor: default;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+  }
+  .canvas.show { opacity: 1; }
+
+  .molecule {
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform, opacity;
+    pointer-events: none;
+    transform-origin: center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* 💡 Подсветка атома */
+  .molecule .atom {
+    transition: filter 0.2s ease;
+  }
+
+  .molecule .atom.lit {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9))
+            drop-shadow(0 0 16px rgba(255, 255, 255, 0.5));
+  }
+
   /* ===== 🔝 Вкладка ===== */
   .topbar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 3;
+    z-index: 30;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -139,14 +170,8 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     opacity: 0;
   }
-
-  .topbar.show {
-    animation: fadeIn 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
+  .topbar.show { animation: fadeIn 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+  @keyframes fadeIn { to { opacity: 1; } }
 
   .brand {
     font-size: 1.15rem;
@@ -172,7 +197,6 @@
     border: none;
     cursor: pointer;
   }
-
   .dots-btn span {
     display: block;
     width: 3px;
@@ -184,31 +208,26 @@
   }
   .dots-btn:hover span,
   .dots-btn:active span { opacity: 1; transform: scale(1.3); }
-
-  .grid { display: none; }
 </style>
 </head>
 <body>
 
-  <!-- Фон -->
   <div class="bg"></div>
 
-  <!-- 🔄 Лоадер -->
   <div class="loader" id="loader">
     <div class="spinner"></div>
   </div>
 
-  <!-- 🎬 Текст 1 -->
   <div class="intro-text" id="text1">
     Химия — это определенно ваше!
   </div>
 
-  <!-- 🎬 Текст 2 -->
   <div class="intro-text blur-in" id="text2">
     Удачного урока!
   </div>
 
-  <!-- 🔝 Вкладка -->
+  <div class="canvas" id="canvas"></div>
+
   <div class="topbar" id="topbar">
     <div class="brand">ХИМИЯ</div>
     <button class="dots-btn" onclick="openMenu()" aria-label="Меню">
@@ -223,34 +242,533 @@
     const text1  = document.getElementById('text1');
     const text2  = document.getElementById('text2');
     const topbar = document.getElementById('topbar');
+    const canvas = document.getElementById('canvas');
 
-    // Лоадер 1.2 сек
-    setTimeout(() => {
-      loader.classList.add('hide');
-    }, 1200);
-
-    // Появление первого текста
-    setTimeout(() => {
-      text1.classList.add('show');
-    }, 1450);
-
-    // Смена с блюром
+    // ===== 🎬 Интро =====
+    setTimeout(() => { loader.classList.add('hide'); }, 1200);
+    setTimeout(() => { text1.classList.add('show'); }, 1450);
     setTimeout(() => {
       text1.classList.remove('show');
       text1.classList.add('blur-out');
       text2.classList.add('show');
     }, 2600);
-
-    // Второй текст исчезает через блюр
     setTimeout(() => {
       text2.classList.remove('show');
       text2.classList.add('hide');
     }, 3800);
-
-    // Вкладка
     setTimeout(() => {
       topbar.classList.add('show');
+      canvas.classList.add('show');
+      initCanvas();
     }, 4000);
+
+    // ===== 🌌 Поверхность =====
+    let offsetX = 0, offsetY = 0;
+    let targetOffsetX = 0, targetOffsetY = 0;
+
+    let molecules = [];
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let startOffsetX = 0, startOffsetY = 0;
+
+    // 🖱️ Позиция курсора
+    let mouseX = -9999;
+    let mouseY = -9999;
+
+    // 📐 Радиус видимой области
+    const VIEW_RADIUS = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      return Math.sqrt((w / 2) ** 2 + (h / 2) ** 2);
+    };
+
+    // 🎯 Плотность
+    const DENSITY = 0.000015;
+
+    const targetCount = () => {
+      const area = Math.PI * VIEW_RADIUS() ** 2 * 2.5;
+      return Math.max(8, Math.floor(area * DENSITY));
+    };
+
+    // 📏 Спавн за экраном
+    const SPAWN_INNER = () => VIEW_RADIUS() + 500;
+    const SPAWN_OUTER = () => VIEW_RADIUS() + 1100;
+    const DESPAWN_RADIUS = () => VIEW_RADIUS() + 2200;
+
+    const MAX_PER_FRAME = 1;
+
+    // 🎈 Левитация
+    const DRIFT_SPEED_MIN = 0.05;
+    const DRIFT_SPEED_MAX = 0.25;
+    const DIRECTION_CHANGE = 0.008;
+    const DRIFT_ACCEL = 0.008;
+
+    // 🎯 Масштабирование
+    const SCALE_MIN = 0.05;
+    const SCALE_MAX = 1.0;
+
+    // 🎨 Цвета атомов
+    const ATOM_COLORS = {
+      C: '#888888',
+      O: '#ff4444',
+      H: '#ffffff',
+      N: '#4a90e2',
+    };
+
+    const BOND_COLOR = 'rgba(255, 255, 255, 0.85)';
+    const BOND_WIDTH_FACTOR = 0.55;
+
+    // 🧪 Простые молекулы
+    const MOLECULE_TYPES = [
+      {
+        atoms: [
+          { el: 'H', x: -1.1, y: 0, r: 0.55 },
+          { el: 'H', x:  1.1, y: 0, r: 0.55 }
+        ],
+        bonds: [[0, 1, 1]]
+      },
+      {
+        atoms: [
+          { el: 'O', x: -1.2, y: 0, r: 0.75 },
+          { el: 'O', x:  1.2, y: 0, r: 0.75 }
+        ],
+        bonds: [[0, 1, 2]]
+      },
+      {
+        atoms: [
+          { el: 'O', x:  0,    y: 0,    r: 0.85 },
+          { el: 'H', x: -1.4,  y: 1.1,  r: 0.5 },
+          { el: 'H', x:  1.4,  y: 1.1,  r: 0.5 }
+        ],
+        bonds: [[0, 1, 1], [0, 2, 1]]
+      },
+      {
+        atoms: [
+          { el: 'O', x: -1.9, y: 0, r: 0.75 },
+          { el: 'C', x:  0,   y: 0, r: 0.85 },
+          { el: 'O', x:  1.9, y: 0, r: 0.75 }
+        ],
+        bonds: [[0, 1, 2], [1, 2, 2]]
+      },
+      {
+        atoms: [
+          { el: 'C', x:  0,    y:  0,    r: 0.85 },
+          { el: 'H', x: -1.6,  y: -1.0,  r: 0.5 },
+          { el: 'H', x:  1.6,  y: -1.0,  r: 0.5 },
+          { el: 'H', x:  0,    y:  1.7,  r: 0.5 },
+          { el: 'H', x:  0,    y: -1.7,  r: 0.5 }
+        ],
+        bonds: [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]]
+      },
+      {
+        atoms: [
+          { el: 'N', x:  0,    y: -0.5, r: 0.85 },
+          { el: 'H', x: -1.4,  y:  1.0, r: 0.5 },
+          { el: 'H', x:  1.4,  y:  1.0, r: 0.5 },
+          { el: 'H', x:  0,    y:  1.6, r: 0.5 }
+        ],
+        bonds: [[0, 1, 1], [0, 2, 1], [0, 3, 1]]
+      },
+    ];
+
+    function createMoleculeSVG() {
+      const type = MOLECULE_TYPES[Math.floor(Math.random() * MOLECULE_TYPES.length)];
+      const unit = 12;
+      const padding = 18;
+
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (const a of type.atoms) {
+        const x = a.x * unit;
+        const y = a.y * unit;
+        const r = a.r * unit;
+        minX = Math.min(minX, x - r);
+        minY = Math.min(minY, y - r);
+        maxX = Math.max(maxX, x + r);
+        maxY = Math.max(maxY, y + r);
+      }
+
+      const w = maxX - minX + padding * 2;
+      const h = maxY - minY + padding * 2;
+      const cx = w / 2;
+      const cy = h / 2;
+      const shiftX = cx - (minX + maxX) / 2;
+      const shiftY = cy - (minY + maxY) / 2;
+
+      let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
+
+      for (const [i, j, order] of type.bonds) {
+        const a1 = type.atoms[i];
+        const a2 = type.atoms[j];
+        const x1 = a1.x * unit + shiftX;
+        const y1 = a1.y * unit + shiftY;
+        const x2 = a2.x * unit + shiftX;
+        const y2 = a2.y * unit + shiftY;
+
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.sqrt(dx * dx + dy * dy);
+
+        const nx = -dy / len;
+        const ny = dx / len;
+
+        const bondWidth = unit * BOND_WIDTH_FACTOR;
+
+        if (order === 1) {
+          svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" 
+            stroke="${BOND_COLOR}" stroke-width="${bondWidth}" stroke-linecap="round"/>`;
+        } else if (order === 2) {
+          const offset = unit * 0.55;
+          svg += `<line x1="${x1 + nx * offset}" y1="${y1 + ny * offset}" 
+                        x2="${x2 + nx * offset}" y2="${y2 + ny * offset}" 
+            stroke="${BOND_COLOR}" stroke-width="${bondWidth * 0.7}" stroke-linecap="round"/>`;
+          svg += `<line x1="${x1 - nx * offset}" y1="${y1 - ny * offset}" 
+                        x2="${x2 - nx * offset}" y2="${y2 - ny * offset}" 
+            stroke="${BOND_COLOR}" stroke-width="${bondWidth * 0.7}" stroke-linecap="round"/>`;
+        }
+      }
+
+      for (const a of type.atoms) {
+        const x = a.x * unit + shiftX;
+        const y = a.y * unit + shiftY;
+        const r = a.r * unit;
+        const color = ATOM_COLORS[a.el] || '#ffffff';
+        svg += `<circle class="atom" 
+                        data-ox="${x}" 
+                        data-oy="${y}" 
+                        data-or="${r}"
+                        cx="${x}" cy="${y}" r="${r}" fill="${color}"/>`;
+      }
+
+      svg += `</svg>`;
+      return { svg, width: w, height: h };
+    }
+
+    function createMolecule() {
+      const inner = SPAWN_INNER();
+      const outer = SPAWN_OUTER();
+
+      const angle = Math.random() * Math.PI * 2;
+      const r = inner + Math.random() * (outer - inner);
+
+      const worldX = -targetOffsetX + Math.cos(angle) * r;
+      const worldY = -targetOffsetY + Math.sin(angle) * r;
+
+      const scaleFactor = 2.5 + Math.random() * 2.5;
+      const { svg, width, height } = createMoleculeSVG();
+      const finalW = width * scaleFactor;
+      const finalH = height * scaleFactor;
+
+      const el = document.createElement('div');
+      el.className = 'molecule';
+      el.style.width = finalW + 'px';
+      el.style.height = finalH + 'px';
+
+      el.innerHTML = svg.replace(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"`,
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${finalW}" height="${finalH}"`
+      );
+
+      canvas.appendChild(el);
+
+      const dirAngle = Math.random() * Math.PI * 2;
+      const speed = DRIFT_SPEED_MIN + Math.random() * (DRIFT_SPEED_MAX - DRIFT_SPEED_MIN);
+      const vx = Math.cos(dirAngle) * speed;
+      const vy = Math.sin(dirAngle) * speed;
+
+      const rotation = Math.random() * 360;
+      const rotationSpeed = (Math.random() - 0.5) * 0.15;
+
+      const atomEls = [...el.querySelectorAll('.atom')];
+      const atomData = atomEls.map(node => ({
+        el: node,
+        ox: parseFloat(node.dataset.ox),
+        oy: parseFloat(node.dataset.oy),
+        or: parseFloat(node.dataset.or),
+      }));
+
+      const mol = {
+        el,
+        x: worldX, y: worldY,
+        w: finalW, h: finalH,
+        vx, vy,
+        tvx: vx, tvy: vy,
+        rotation,
+        rotationSpeed,
+        atoms: atomData,
+        scaleFactor,
+      };
+      molecules.push(mol);
+
+      el.style.opacity = '0';
+      el.style.transition = 'opacity 1.5s ease';
+      requestAnimationFrame(() => {
+        el.style.opacity = '';
+        el.style.transition = '';
+      });
+
+      return mol;
+    }
+
+    function removeMolecule(mol) {
+      mol.el.style.transition = 'opacity 0.5s ease';
+      mol.el.style.opacity = '0';
+      setTimeout(() => { mol.el.remove(); }, 500);
+      molecules = molecules.filter(m => m !== mol);
+    }
+
+    function updateMolecules() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const maxDist = Math.sqrt((w / 2) ** 2 + (h / 2) ** 2);
+      const despawnR = DESPAWN_RADIUS();
+
+      for (let i = molecules.length - 1; i >= 0; i--) {
+        const m = molecules[i];
+
+        if (Math.random() < DIRECTION_CHANGE) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = DRIFT_SPEED_MIN + Math.random() * (DRIFT_SPEED_MAX - DRIFT_SPEED_MIN);
+          m.tvx = Math.cos(angle) * speed;
+          m.tvy = Math.sin(angle) * speed;
+        }
+
+        m.vx += (m.tvx - m.vx) * DRIFT_ACCEL;
+        m.vy += (m.tvy - m.vy) * DRIFT_ACCEL;
+
+        m.x += m.vx;
+        m.y += m.vy;
+        m.rotation += m.rotationSpeed;
+
+        const screenX = m.x + offsetX;
+        const screenY = m.y + offsetY;
+
+        const worldDistX = m.x + targetOffsetX;
+        const worldDistY = m.y + targetOffsetY;
+        const worldDist = Math.sqrt(worldDistX * worldDistX + worldDistY * worldDistY);
+
+        if (worldDist > despawnR) {
+          removeMolecule(m);
+          continue;
+        }
+
+        const dx = screenX - w / 2;
+        const dy = screenY - h / 2;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        const t = Math.max(0, 1 - dist / maxDist);
+
+        const SHRINK_ZONE = 0.92;
+        const tShifted = Math.max(0, (t - (1 - SHRINK_ZONE)) / SHRINK_ZONE);
+        const tSmooth = Math.pow(tShifted, 1.0);
+
+        const scale = SCALE_MIN + tSmooth * (SCALE_MAX - SCALE_MIN);
+        const opacity = 0.3 + tSmooth * 0.65;
+
+        m.el.style.transform =
+          `translate(${screenX - m.w / 2}px, ${screenY - m.h / 2}px) scale(${scale}) rotate(${m.rotation}deg)`;
+        m.el.style.opacity = opacity;
+      }
+    }
+
+    // 💥 Мягкое отталкивание
+    function resolveCollisions() {
+      const PUSH = 0.08;
+
+      for (let i = 0; i < molecules.length; i++) {
+        const a = molecules[i];
+
+        for (let j = i + 1; j < molecules.length; j++) {
+          const b = molecules[j];
+
+          const MIN_DIST = (a.w + b.w) * 0.45 + 30;
+
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq === 0 || distSq > MIN_DIST * MIN_DIST) continue;
+
+          const dist = Math.sqrt(distSq);
+          const overlap = MIN_DIST - dist;
+
+          const nx = dx / dist;
+          const ny = dy / dist;
+
+          const shift = overlap * PUSH;
+
+          a.x -= nx * shift;
+          a.y -= ny * shift;
+          b.x += nx * shift;
+          b.y += ny * shift;
+        }
+      }
+    }
+
+    // 🖱️ Обновление позиции курсора
+    function onMouseMove(e) {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    }
+
+    // 💡 Подсветка ближайшего атома
+    function updateHighlight() {
+      const HOVER_RADIUS = 40;
+
+      // Снимаем подсветку со всех
+      for (const m of molecules) {
+        for (const a of m.atoms) {
+          a.el.classList.remove('lit');
+        }
+      }
+
+      if (mouseX < 0 || mouseY < 0) return;
+
+      let best = null;
+      let bestDist = HOVER_RADIUS * HOVER_RADIUS;
+
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const maxDist = Math.sqrt((w / 2) ** 2 + (h / 2) ** 2);
+
+      for (const m of molecules) {
+        const cx = m.x + offsetX;
+        const cy = m.y + offsetY;
+
+        const dxm = cx - w / 2;
+        const dym = cy - h / 2;
+        const distM = Math.sqrt(dxm * dxm + dym * dym);
+        const t = Math.max(0, 1 - distM / maxDist);
+        const SHRINK_ZONE = 0.92;
+        const tShifted = Math.max(0, (t - (1 - SHRINK_ZONE)) / SHRINK_ZONE);
+        const tSmooth = Math.pow(tShifted, 1.0);
+        const scale = SCALE_MIN + tSmooth * (SCALE_MAX - SCALE_MIN);
+
+        const angleRad = (m.rotation * Math.PI) / 180;
+        const cosA = Math.cos(angleRad);
+        const sinA = Math.sin(angleRad);
+
+        const molCenterX = cx;
+        const molCenterY = cy;
+
+        for (const a of m.atoms) {
+          const svgCx = m.w / 2;
+          const svgCy = m.h / 2;
+
+          let ax = a.ox - svgCx;
+          let ay = a.oy - svgCy;
+
+          ax *= scale;
+          ay *= scale;
+
+          const rx = ax * cosA - ay * sinA;
+          const ry = ax * sinA + ay * cosA;
+
+          const atomScreenX = molCenterX + rx;
+          const atomScreenY = molCenterY + ry;
+
+          const atomR = a.or * scale;
+
+          const dx = atomScreenX - mouseX;
+          const dy = atomScreenY - mouseY;
+          const distSq = dx * dx + dy * dy;
+
+          const effective = Math.max(atomR + 8, HOVER_RADIUS * 0.5);
+          if (distSq < effective * effective && distSq < bestDist) {
+            bestDist = distSq;
+            best = a;
+          }
+        }
+      }
+
+      if (best) {
+        best.el.classList.add('lit');
+      }
+    }
+
+    function loop() {
+      offsetX += (targetOffsetX - offsetX) * 0.12;
+      offsetY += (targetOffsetY - offsetY) * 0.12;
+
+      const needed = targetCount();
+
+      let added = 0;
+      while (molecules.length < needed && added < MAX_PER_FRAME) {
+        createMolecule();
+        added++;
+      }
+
+      resolveCollisions();
+      updateMolecules();
+      updateHighlight();
+      requestAnimationFrame(loop);
+    }
+
+    function initCanvas() {
+      // 🎬 На старте заполняем только 40%
+      const initialCount = Math.max(3, Math.floor(targetCount() * 0.4));
+      for (let i = 0; i < initialCount; i++) {
+        createMolecule();
+        const m = molecules[molecules.length - 1];
+        const r = Math.sqrt(Math.random()) * (VIEW_RADIUS() + 300);
+        const a = Math.random() * Math.PI * 2;
+        m.x = -targetOffsetX + Math.cos(a) * r;
+        m.y = -targetOffsetY + Math.sin(a) * r;
+        m.el.style.opacity = '1';
+        m.el.style.transition = '';
+      }
+
+      offsetX = targetOffsetX = 0;
+      offsetY = targetOffsetY = 0;
+
+      loop();
+
+      // 🖱️ Мышь
+      window.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startOffsetX = targetOffsetX;
+        startOffsetY = targetOffsetY;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        targetOffsetX = startOffsetX + (e.clientX - startX);
+        targetOffsetY = startOffsetY + (e.clientY - startY);
+      });
+
+      window.addEventListener('mouseup', () => { isDragging = false; });
+
+      // 📱 Тач
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        isDragging = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        startOffsetX = targetOffsetX;
+        startOffsetY = targetOffsetY;
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (e) => {
+        if (!isDragging || e.touches.length !== 1) return;
+        e.preventDefault();
+        targetOffsetX = startOffsetX + (e.touches[0].clientX - startX);
+        targetOffsetY = startOffsetY + (e.touches[0].clientY - startY);
+      }, { passive: false });
+
+      window.addEventListener('touchend', () => { isDragging = false; });
+
+      window.addEventListener('dragstart', (e) => e.preventDefault());
+
+      // 🖱️ Отслеживание позиции курсора для подсветки
+      window.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseleave', () => {
+        mouseX = -9999;
+        mouseY = -9999;
+      });
+    }
 
     function openMenu() { console.log('Меню открыто'); }
   </script>
