@@ -131,25 +131,26 @@
   }
   .canvas.show { opacity: 1; }
 
-  .molecule {
+    .molecule {
     position: absolute;
     top: 0;
     left: 0;
-    will-change: transform, opacity;
+    will-change: transform, opacity, filter;
     pointer-events: none;
     transform-origin: center;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    transition: filter 0.25s ease;
   }
 
-  /* 💡 Подсветка атома */
-  .molecule .atom {
-    transition: filter 0.2s ease;
-  }
-
-  .molecule .atom.lit {
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9))
-            drop-shadow(0 0 16px rgba(255, 255, 255, 0.5));
+  /* 💡 Обводка жёлтая + затемнение при наведении */
+  .molecule.lit {
+    filter:
+      brightness(0.55)
+      drop-shadow(1.5px 0 0 #ffdd00)
+      drop-shadow(-1.5px 0 0 #ffdd00)
+      drop-shadow(0 1.5px 0 #ffdd00)
+      drop-shadow(0 -1.5px 0 #ffdd00);
   }
 
   /* ===== 🔝 Вкладка ===== */
@@ -394,6 +395,10 @@
       const shiftX = cx - (minX + maxX) / 2;
       const shiftY = cy - (minY + maxY) / 2;
 
+      // ✅ РЕАЛЬНЫЙ размер молекулы (без padding)
+      const realW = maxX - minX;
+      const realH = maxY - minY;
+
       let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
 
       for (const [i, j, order] of type.bonds) {
@@ -440,7 +445,7 @@
       }
 
       svg += `</svg>`;
-      return { svg, width: w, height: h };
+      return { svg, width: w, height: h, realW, realH };
     }
 
     function createMolecule() {
@@ -454,7 +459,7 @@
       const worldY = -targetOffsetY + Math.sin(angle) * r;
 
       const scaleFactor = 2.5 + Math.random() * 2.5;
-      const { svg, width, height } = createMoleculeSVG();
+      const { svg, width, height, realW, realH } = createMoleculeSVG();
       const finalW = width * scaleFactor;
       const finalH = height * scaleFactor;
 
@@ -478,23 +483,16 @@
       const rotation = Math.random() * 360;
       const rotationSpeed = (Math.random() - 0.5) * 0.15;
 
-      const atomEls = [...el.querySelectorAll('.atom')];
-      const atomData = atomEls.map(node => ({
-        el: node,
-        ox: parseFloat(node.dataset.ox),
-        oy: parseFloat(node.dataset.oy),
-        or: parseFloat(node.dataset.or),
-      }));
-
       const mol = {
         el,
         x: worldX, y: worldY,
         w: finalW, h: finalH,
+        realW: realW * scaleFactor,
+        realH: realH * scaleFactor,
         vx, vy,
         tvx: vx, tvy: vy,
         rotation,
         rotationSpeed,
-        atoms: atomData,
         scaleFactor,
       };
       molecules.push(mol);
@@ -610,30 +608,28 @@
       mouseY = e.clientY;
     }
 
-    // 💡 Подсветка ближайшего атома
+    // 💡 Обводка ближайшей молекулы (по реальному размеру)
     function updateHighlight() {
-      const HOVER_RADIUS = 40;
-
-      // Снимаем подсветку со всех
+      // Снимаем обводку со всех
       for (const m of molecules) {
-        for (const a of m.atoms) {
-          a.el.classList.remove('lit');
-        }
+        m.el.classList.remove('lit');
       }
 
       if (mouseX < 0 || mouseY < 0) return;
 
       let best = null;
-      let bestDist = HOVER_RADIUS * HOVER_RADIUS;
+      let bestDist = Infinity;
 
       const w = window.innerWidth;
       const h = window.innerHeight;
       const maxDist = Math.sqrt((w / 2) ** 2 + (h / 2) ** 2);
 
       for (const m of molecules) {
+        // Центр молекулы на экране
         const cx = m.x + offsetX;
         const cy = m.y + offsetY;
 
+        // Масштаб молекулы по позиции
         const dxm = cx - w / 2;
         const dym = cy - h / 2;
         const distM = Math.sqrt(dxm * dxm + dym * dym);
@@ -643,40 +639,22 @@
         const tSmooth = Math.pow(tShifted, 1.0);
         const scale = SCALE_MIN + tSmooth * (SCALE_MAX - SCALE_MIN);
 
-        const angleRad = (m.rotation * Math.PI) / 180;
-        const cosA = Math.cos(angleRad);
-        const sinA = Math.sin(angleRad);
+        // ✅ РЕАЛЬНЫЙ размер молекулы (без padding!)
+        const molW = m.realW * scale;
+        const molH = m.realH * scale;
 
-        const molCenterX = cx;
-        const molCenterY = cy;
+        // Расстояние от курсора до центра молекулы
+        const dx = mouseX - cx;
+        const dy = mouseY - cy;
 
-        for (const a of m.atoms) {
-          const svgCx = m.w / 2;
-          const svgCy = m.h / 2;
+        // ✅ Проверка по эллипсу — точно по контуру молекулы
+        const nx = dx / (molW * 0.5);
+        const ny = dy / (molH * 0.5);
+        const ellipseDist = nx * nx + ny * ny;
 
-          let ax = a.ox - svgCx;
-          let ay = a.oy - svgCy;
-
-          ax *= scale;
-          ay *= scale;
-
-          const rx = ax * cosA - ay * sinA;
-          const ry = ax * sinA + ay * cosA;
-
-          const atomScreenX = molCenterX + rx;
-          const atomScreenY = molCenterY + ry;
-
-          const atomR = a.or * scale;
-
-          const dx = atomScreenX - mouseX;
-          const dy = atomScreenY - mouseY;
-          const distSq = dx * dx + dy * dy;
-
-          const effective = Math.max(atomR + 8, HOVER_RADIUS * 0.5);
-          if (distSq < effective * effective && distSq < bestDist) {
-            bestDist = distSq;
-            best = a;
-          }
+        if (ellipseDist < 1.0 && ellipseDist < bestDist) {
+          bestDist = ellipseDist;
+          best = m;
         }
       }
 
