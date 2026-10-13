@@ -5,15 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ХИМИЯ</title>
 
-<!-- 🎨 Favicon: ХИМИЯ белым на чёрном -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23000000'/><text x='100' y='118' font-family='Arial,sans-serif' font-size='44' font-weight='900' fill='%23ffffff' text-anchor='middle' letter-spacing='1'>ХИМИЯ</text></svg>">
 
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; overflow: hidden; }
-  body { background: #000; font-family: -apple-system, 'Segoe UI', sans-serif; color: #fff; }
 
-  /* ===== Градиентный фон (нежное появление) ===== */
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* ===== Фон на весь экран ===== */
   .bg {
     position: fixed;
     inset: 0;
@@ -28,7 +36,79 @@
   }
   @keyframes bgAppear { to { opacity: 1; transform: scale(1); } }
 
-  /* ===== Три точки в правом верхнем углу ===== */
+  /* ===== Текст ХИМИЯ — увеличивается на месте ===== */
+  .title {
+    position: absolute;
+    top: 12vh;
+    left: 50%;
+    z-index: 1;
+    font-size: 4rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    background: linear-gradient(135deg, #ffffff 0%, #999999 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    user-select: none;
+
+    /* Начальное состояние: на своём месте, но маленький и прозрачный */
+    opacity: 0;
+    transform: translateX(-50%) scale(0.3);
+
+    animation: titleGrow 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+  }
+
+  @keyframes titleGrow {
+    to {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+  }
+
+  /* ===== 🟦 4 блюрных блока ===== */
+  .grid {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .box {
+    width: 110px;
+    height: 110px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: background 0.3s ease;
+
+    opacity: 0;
+    transform: translateY(120vh);
+    animation: boxSlideUp 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .box:nth-child(1) { animation-delay: 1.0s; }
+  .box:nth-child(2) { animation-delay: 1.15s; }
+  .box:nth-child(3) { animation-delay: 1.3s; }
+  .box:nth-child(4) { animation-delay: 1.45s; }
+
+  @keyframes boxSlideUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .box:hover,
+  .box:active {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* ===== Три точки ===== */
   .dots-btn {
     position: fixed;
     top: 22px;
@@ -65,6 +145,15 @@
 </head>
 <body>
   <div class="bg"></div>
+
+  <h1 class="title">ХИМИЯ</h1>
+
+  <div class="grid">
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+  </div>
 
   <button class="dots-btn" onclick="openMenu()" aria-label="Меню">
     <span></span>
