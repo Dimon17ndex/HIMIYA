@@ -13,6 +13,7 @@
   html, body { height: 100%; overflow: hidden; }
   body { background: #000; font-family: -apple-system, 'Segoe UI', sans-serif; color: #fff; }
 
+  /* ===== Градиентный фон (нежное появление) ===== */
   .bg {
     position: fixed;
     inset: 0;
@@ -27,21 +28,12 @@
   }
   @keyframes bgAppear { to { opacity: 1; transform: scale(1); } }
 
-  .topbar {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    height: 90px;
-    padding: 22px 20px 0 20px;
-    background: #2a2a2a;
-    opacity: 0;
-    animation: fadeIn 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s forwards;
-  }
-  @keyframes fadeIn { to { opacity: 1; } }
-
+  /* ===== Три точки в правом верхнем углу ===== */
   .dots-btn {
+    position: fixed;
+    top: 22px;
+    right: 20px;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -53,7 +45,11 @@
     background: transparent;
     border: none;
     cursor: pointer;
+    opacity: 0;
+    animation: fadeIn 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s forwards;
   }
+  @keyframes fadeIn { to { opacity: 1; } }
+
   .dots-btn span {
     display: block;
     width: 3px;
@@ -70,13 +66,11 @@
 <body>
   <div class="bg"></div>
 
-  <div class="topbar">
-    <button class="dots-btn" onclick="openMenu()" aria-label="Меню">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-  </div>
+  <button class="dots-btn" onclick="openMenu()" aria-label="Меню">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
 
   <script>
     function openMenu() { console.log('Меню открыто'); }
