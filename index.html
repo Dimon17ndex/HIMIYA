@@ -4,26 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ХИМИЯ</title>
+
+<!-- 🎨 Favicon: ХИМИЯ белым на чёрном -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect width='200' height='100' rx='18' fill='%23000000'/><text x='100' y='67' font-family='Arial,sans-serif' font-size='46' font-weight='900' fill='%23ffffff' text-anchor='middle' letter-spacing='2'>ХИМИЯ</text></svg>">
+
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body { background: #000; font-family: -apple-system, 'Segoe UI', sans-serif; color: #fff; }
 
-  html, body {
-    height: 100%;
-    overflow: hidden;
-  }
-
-  body {
-    background: #000;
-    font-family: -apple-system, 'Segoe UI', sans-serif;
-    color: #fff;
-  }
-
-  /* ===== Градиентный фон (нежное появление) ===== */
   .bg {
     position: fixed;
     inset: 0;
@@ -36,15 +25,8 @@
     transform: scale(1.05);
     animation: bgAppear 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
+  @keyframes bgAppear { to { opacity: 1; transform: scale(1); } }
 
-  @keyframes bgAppear {
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  /* ===== Верхняя панель (светло-серая плашка) ===== */
   .topbar {
     position: relative;
     z-index: 2;
@@ -57,12 +39,8 @@
     opacity: 0;
     animation: fadeIn 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s forwards;
   }
+  @keyframes fadeIn { to { opacity: 1; } }
 
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-
-  /* Три точки — маленькие, без подложки */
   .dots-btn {
     display: flex;
     flex-direction: column;
@@ -76,7 +54,6 @@
     border: none;
     cursor: pointer;
   }
-
   .dots-btn span {
     display: block;
     width: 3px;
@@ -86,12 +63,8 @@
     opacity: 0.9;
     transition: all 0.25s ease;
   }
-
   .dots-btn:hover span,
-  .dots-btn:active span {
-    opacity: 1;
-    transform: scale(1.3);
-  }
+  .dots-btn:active span { opacity: 1; transform: scale(1.3); }
 </style>
 </head>
 <body>
@@ -106,9 +79,7 @@
   </div>
 
   <script>
-    function openMenu() {
-      console.log('Меню открыто');
-    }
+    function openMenu() { console.log('Меню открыто'); }
   </script>
 </body>
 </html>
