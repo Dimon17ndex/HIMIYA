@@ -44,7 +44,7 @@
     }
   }
 
-  /* ===== Верхняя панель (вкладка, вытянутая вниз) ===== */
+  /* ===== Верхняя панель (светло-серая плашка) ===== */
   .topbar {
     position: relative;
     z-index: 2;
@@ -53,12 +53,7 @@
     justify-content: flex-end;
     height: 90px;
     padding: 22px 20px 0 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-
-    /* Появление как фон — плавное проявление, без выезда */
+    background: #2a2a2a;
     opacity: 0;
     animation: fadeIn 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s forwards;
   }
@@ -80,7 +75,6 @@
     background: transparent;
     border: none;
     cursor: pointer;
-    transition: opacity 0.25s ease;
   }
 
   .dots-btn span {
@@ -88,8 +82,8 @@
     width: 3px;
     height: 3px;
     border-radius: 50%;
-    background: #fff;
-    opacity: 0.85;
+    background: #e0e0e0;
+    opacity: 0.9;
     transition: all 0.25s ease;
   }
 
