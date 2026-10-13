@@ -57,17 +57,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 10px;                /* ← минимальные отступы */
     text-align: center;
     color: #ffffff;
     font-weight: 700;
     letter-spacing: 0.02em;
+    font-size: 1.6rem;              /* ← тот же размер */
 
-    /* 📱 Одна линия + адаптивный размер */
-    font-size: clamp(0.95rem, 4.2vw, 1.6rem);
+    /* 📱 Строго в одну линию */
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 
     pointer-events: none;
 
@@ -84,7 +82,7 @@
     transform: translateY(0) scale(1);
   }
 
-  /* Уход в блюр (для смены) */
+  /* Уход в блюр (смена) */
   .intro-text.blur-out {
     opacity: 0;
     filter: blur(14px);
@@ -106,7 +104,7 @@
     transition: opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease;
   }
 
-  /* Быстрое исчезновение на месте через блюр */
+  /* Быстрое исчезновение на месте */
   .intro-text.hide {
     opacity: 0;
     filter: blur(14px);
@@ -228,30 +226,30 @@
     const text2  = document.getElementById('text2');
     const topbar = document.getElementById('topbar');
 
-    // ⏱️ Лоадер держится 1.2 секунды (дольше)
+    // Лоадер 1.2 сек
     setTimeout(() => {
       loader.classList.add('hide');
     }, 1200);
 
-    // 2) Появление первого текста — сразу после лоадера
+    // Появление первого текста
     setTimeout(() => {
       text1.classList.add('show');
     }, 1450);
 
-    // 3) Смена с блюром
+    // Смена с блюром
     setTimeout(() => {
       text1.classList.remove('show');
       text1.classList.add('blur-out');
       text2.classList.add('show');
     }, 2600);
 
-    // 4) Второй текст быстро исчезает через блюр
+    // Второй текст исчезает через блюр
     setTimeout(() => {
       text2.classList.remove('show');
       text2.classList.add('hide');
     }, 3800);
 
-    // 5) Вкладка
+    // Вкладка
     setTimeout(() => {
       topbar.classList.add('show');
     }, 4000);
