@@ -57,15 +57,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0 10px;                /* ← минимальные отступы */
+    padding: 0 25px;
     text-align: center;
     color: #ffffff;
     font-weight: 700;
     letter-spacing: 0.02em;
-    font-size: 1.6rem;              /* ← тот же размер */
-
-    /* 📱 Строго в одну линию */
-    white-space: nowrap;
+    font-size: 1.6rem;
+    line-height: 1.3;
 
     pointer-events: none;
 
@@ -104,7 +102,7 @@
     transition: opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease;
   }
 
-  /* Быстрое исчезновение на месте */
+  /* Быстрое исчезновение на месте через блюр */
   .intro-text.hide {
     opacity: 0;
     filter: blur(14px);
