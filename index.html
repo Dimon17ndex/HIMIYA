@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Фон</title>
+<title>ХИМИЯ</title>
 <style>
   * {
     margin: 0;
@@ -18,35 +18,47 @@
 
   body {
     background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: -apple-system, 'Segoe UI', sans-serif;
   }
 
-  /* ===== Градиентный фон ===== */
+  /* ===== Градиентный фон (статичный, тёмный) ===== */
   .bg {
     position: fixed;
     inset: 0;
     background:
-      radial-gradient(circle at 20% 15%, #3a3a3a 0%, transparent 45%),
-      radial-gradient(circle at 85% 70%, #2a2a2a 0%, transparent 50%),
-      radial-gradient(circle at 50% 100%, #1f1f1f 0%, transparent 60%),
-      linear-gradient(180deg, #0f0f0f 0%, #050505 100%);
+      radial-gradient(circle at 20% 15%, #1c1c1c 0%, transparent 45%),
+      radial-gradient(circle at 85% 70%, #161616 0%, transparent 50%),
+      radial-gradient(circle at 50% 100%, #121212 0%, transparent 60%),
+      linear-gradient(180deg, #0a0a0a 0%, #030303 100%);
+    z-index: 0;
   }
 
-  /* Лёгкое мерцание */
-  .bg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03), transparent 70%);
-    animation: pulse 8s ease-in-out infinite;
+  /* ===== Заголовок ХИМИЯ ===== */
+  .title {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(3rem, 18vw, 10rem);
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, #ffffff 0%, #888888 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeIn 1.2s ease-out;
+    user-select: none;
   }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 0.5; transform: scale(1); }
-    50%      { opacity: 1;   transform: scale(1.1); }
+  @keyframes fadeIn {
+    from { opacity: 0; letter-spacing: 0.4em; }
+    to   { opacity: 1; letter-spacing: 0.15em; }
   }
 </style>
 </head>
 <body>
   <div class="bg"></div>
+  <h1 class="title">ХИМИЯ</h1>
 </body>
 </html>
