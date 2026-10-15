@@ -100,7 +100,8 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 
     opacity: 0;
-    animation: fadeIn 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+    /* 🆕 Задержка 1.6s — после исчезновения лоадера */
+    animation: fadeIn 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.6s forwards;
   }
 
   @keyframes fadeIn {
@@ -221,7 +222,8 @@
     text-align: center;
 
     opacity: 0;
-    animation: contentAppear 1s cubic-bezier(0.4, 0, 0.2, 1) 0.6s forwards;
+    /* 🆕 Задержка 1.8s — появляется после верхней панели */
+    animation: contentAppear 1s cubic-bezier(0.4, 0, 0.2, 1) 1.8s forwards;
   }
 
   @keyframes contentAppear {
@@ -308,7 +310,7 @@
     }, 1200);
 
     // ============================================================
-    // ⬅️ ВОЗВРАТ НАЗАД
+    // ⬅️ ВОЗВРАТ НАЗАД — плавный переход
     // ============================================================
     function goBack() {
       // 🚫 Блокируем всё
@@ -317,7 +319,7 @@
       // Нежное затухание
       document.body.classList.add('fade-out');
 
-      // Возврат через 1.2s
+      // Возврат через 1.2s (после завершения затухания)
       setTimeout(() => {
         // Если пришли из истории — вернёмся туда
         if (window.history.length > 1) {
