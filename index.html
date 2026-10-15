@@ -933,6 +933,18 @@
   </div>
 
   <script>
+    
+    // ============================================================
+// 🌐 SERVICE WORKER — офлайн-режим
+// ============================================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW зарегистрирован:', reg.scope))
+      .catch(err => console.error('SW ошибка:', err));
+  });
+}
+
     const isAndroid = /Android/i.test(navigator.userAgent);
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream;
     const isMobile = isAndroid || isIOS;
