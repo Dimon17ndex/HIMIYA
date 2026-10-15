@@ -1155,6 +1155,22 @@
       }
     }
 
+    // 🆕 ПЕРЕХОД НА ABOUT.HTML ПРИ КЛИКЕ НА ПЛАШКУ "О ПРОЕКТЕ"
+    infoPanel.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      // Блокируем всё
+      document.body.style.pointerEvents = 'none';
+      
+      // Нежное затухание
+      document.body.classList.add('fade-out');
+      
+      // Переход через 1.2s
+      setTimeout(() => {
+        window.location.href = 'about.html';
+      }, 1200);
+    });
+
     document.addEventListener('click', (e) => {
       const dotsBtn = document.querySelector('.dots-btn');
       if (!infoPanel.contains(e.target) && !dotsBtn.contains(e.target)) {
