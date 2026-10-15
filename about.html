@@ -32,6 +32,10 @@
 
   /* ===== 🎬 Плавное появление всей страницы ===== */
   body {
+    opacity: 1;
+  }
+
+  body.page-enter {
     opacity: 0;
     animation: pageAppear 1s ease-out 0.3s forwards;
   }
@@ -42,9 +46,9 @@
 
   /* ===== 🎬 Финальное затухание страницы ===== */
   body.fade-out {
+    animation: none !important;
     transition: opacity 1.2s ease;
     opacity: 0;
-    animation: none;
   }
 
   /* ===== 🔄 Лоадер ===== */
@@ -100,7 +104,6 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 
     opacity: 0;
-    /* 🆕 Задержка 1.6s — после исчезновения лоадера */
     animation: fadeIn 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.6s forwards;
   }
 
@@ -222,7 +225,6 @@
     text-align: center;
 
     opacity: 0;
-    /* 🆕 Задержка 1.8s — появляется после верхней панели */
     animation: contentAppear 1s cubic-bezier(0.4, 0, 0.2, 1) 1.8s forwards;
   }
 
@@ -253,7 +255,7 @@
   .content { scrollbar-width: none; }
 </style>
 </head>
-<body>
+<body class="page-enter">
 
   <!-- Фон -->
   <div class="bg"></div>
@@ -301,6 +303,13 @@
     console.log('Android:', isAndroid, '| iOS:', isIOS, '| Mobile:', isMobile);
 
     // ============================================================
+    // 🎬 СНИМАЕМ КЛАСС page-enter ПОСЛЕ ПОЯВЛЕНИЯ
+    // ============================================================
+    setTimeout(() => {
+      document.body.classList.remove('page-enter');
+    }, 1500);
+
+    // ============================================================
     // 🔄 ЛОАДЕР — крутится 1.2с, потом исчезает
     // ============================================================
     const loader = document.getElementById('loader');
@@ -310,24 +319,24 @@
     }, 1200);
 
     // ============================================================
-    // ⬅️ ВОЗВРАТ НАЗАД — плавный переход
+    // ⬅️ ВОЗВРАТ НАЗАД — плавное затухание, потом переход
     // ============================================================
+    let isLeaving = false;
+
     function goBack() {
-      // 🚫 Блокируем всё
+      // 🛡️ Защита от двойного клика
+      if (isLeaving) return;
+      isLeaving = true;
+
+      // 🚫 Блокируем все клики
       document.body.style.pointerEvents = 'none';
 
-      // Нежное затухание
+      // 🎬 Плавное затухание (1.2s)
       document.body.classList.add('fade-out');
 
-      // Возврат через 1.2s (после завершения затухания)
+      // ⏳ Ждём полного завершения затухания, потом переходим
       setTimeout(() => {
-        // Если пришли из истории — вернёмся туда
-        if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          // Иначе — на главную
-          window.location.href = 'index.html';
-        }
+        window.location.href = 'index.html';
       }, 1200);
     }
 
