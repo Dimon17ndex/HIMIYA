@@ -127,7 +127,7 @@
       linear-gradient(180deg, #0a0a0a 0%, #030303 100%);
   }
 
-  /* ===== 🎬 Сцена ===== */
+  /* ===== 🎬 Сцена (ПК) ===== */
   .scene {
     position: fixed;
     inset: 0;
@@ -144,6 +144,11 @@
     pointer-events: auto;
   }
 
+  /* 🚫 ПК-сцена СКРЫТА на мобильных */
+  body.mobile .scene {
+    display: none !important;
+  }
+
   /* 🚫 Когда всё некликабельно */
   body.locked .scene,
   body.locked .scene *,
@@ -152,10 +157,36 @@
     pointer-events: none !important;
   }
 
-  /* 🚫 На мобильных — убираем cursor: pointer */
-  body.mobile .laptop,
-  body.mobile .flask {
-    cursor: default;
+  /* ===== 📱 Мобильный контент (появится позже) ===== */
+  .mobile-content {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 24px 24px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 1s ease 0.3s;
+  }
+
+  /* Показываем ТОЛЬКО на мобильных */
+  body.mobile .mobile-content {
+    display: flex;
+  }
+
+  body.mobile .mobile-content.show {
+    opacity: 1;
+  }
+
+  /* Плейсхолдер — потом заменишь на свой контент */
+  .mobile-content-placeholder {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    line-height: 1.5;
   }
 
   /* ===== 🪑 Стол ===== */
@@ -676,7 +707,7 @@
     transition: all 0.25s ease;
   }
 
-  /* 💡 Эффект точек — ТОЛЬКО для устройств с настоящим курсором (ПК) */
+  /* 💡 Эффект точек — ТОЛЬКО для ПК */
   @media (hover: hover) and (pointer: fine) {
     .dots-btn:hover span,
     .dots-btn:active span {
@@ -685,7 +716,7 @@
     }
   }
 
-  /* 🚫 На мобильных — убираем ВСЕ эффекты точек */
+  /* 🚫 На мобильных — убираем эффекты точек */
   body.mobile .dots-btn span,
   body.mobile .dots-btn:hover span,
   body.mobile .dots-btn:active span {
@@ -710,6 +741,15 @@
     Удачного урока!
   </div>
 
+  <!-- 📱 Мобильный контент (появится после лоадера) -->
+  <div class="mobile-content" id="mobileContent">
+    <div class="mobile-content-placeholder">
+      📱 Мобильная версия<br>
+      (контент добавим позже)
+    </div>
+  </div>
+
+  <!-- 🎬 Сцена для ПК -->
   <div class="scene" id="scene">
 
     <div class="table" id="table">
@@ -808,6 +848,7 @@
     const laptopMenu = document.getElementById('laptopMenu');
     const flasks     = document.querySelectorAll('.flask');
     const scene      = document.getElementById('scene');
+    const mobileContent = document.getElementById('mobileContent');
 
     // ===== 🎯 Проверяем, заходим первый раз или возвращаемся =====
     const isFirstVisit = !sessionStorage.getItem('visited');
@@ -815,6 +856,7 @@
     if (isFirstVisit) {
       sessionStorage.setItem('visited', 'true');
 
+      // Интро
       setTimeout(() => { loader.classList.add('hide'); }, 1200);
       setTimeout(() => { text1.classList.add('show'); }, 1450);
       setTimeout(() => {
@@ -826,69 +868,84 @@
         text2.classList.remove('show');
         text2.classList.add('hide');
       }, 3800);
+
+      // После интро — показываем контент
       setTimeout(() => {
         topbar.classList.add('show');
-        table.classList.add('show');
+
+        if (isMobile) {
+          // 📱 На мобильных — показываем мобильный контент
+          mobileContent.classList.add('show');
+        } else {
+          // 💻 На ПК — показываем сцену со столом
+          table.classList.add('show');
+        }
       }, 4000);
 
     } else {
+      // Возврат — пропускаем интро
       document.body.classList.add('skip-intro');
 
       setTimeout(() => {
         topbar.classList.add('show');
-        table.classList.add('show');
+
+        if (isMobile) {
+          mobileContent.classList.add('show');
+        } else {
+          table.classList.add('show');
+        }
       }, 100);
     }
 
-    // ===== 💡 Подсветка =====
+    // ============================================================
+    // 💻 ПК-ЛОГИКА (не работает на мобильных)
+    // ============================================================
+
+    // ===== 💡 Подсветка (только ПК) =====
     let mouseX = -9999;
     let mouseY = -9999;
 
-    window.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-
-    document.addEventListener('mouseleave', () => {
-      mouseX = -9999;
-      mouseY = -9999;
-    });
-
-    function checkHover() {
-      // 🚫 На мобильных подсветка не работает
-      if (isMobile) {
-        requestAnimationFrame(checkHover);
-        return;
-      }
-
-      if (!laptopMenu.classList.contains('show')) {
-        const rect = laptop.getBoundingClientRect();
-        const inside =
-          mouseX >= rect.left && mouseX <= rect.right &&
-          mouseY >= rect.top && mouseY <= rect.bottom;
-
-        if (inside) laptop.classList.add('lit');
-        else laptop.classList.remove('lit');
-      } else {
-        laptop.classList.remove('lit');
-      }
-
-      flasks.forEach(flask => {
-        const rect = flask.getBoundingClientRect();
-        const inside =
-          mouseX >= rect.left && mouseX <= rect.right &&
-          mouseY >= rect.top && mouseY <= rect.bottom;
-
-        if (inside) flask.classList.add('lit');
-        else flask.classList.remove('lit');
+    if (!isMobile) {
+      window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
       });
 
-      requestAnimationFrame(checkHover);
+      document.addEventListener('mouseleave', () => {
+        mouseX = -9999;
+        mouseY = -9999;
+      });
+
+      function checkHover() {
+        if (!laptopMenu.classList.contains('show')) {
+          const rect = laptop.getBoundingClientRect();
+          const inside =
+            mouseX >= rect.left && mouseX <= rect.right &&
+            mouseY >= rect.top && mouseY <= rect.bottom;
+
+          if (inside) laptop.classList.add('lit');
+          else laptop.classList.remove('lit');
+        } else {
+          laptop.classList.remove('lit');
+        }
+
+        flasks.forEach(flask => {
+          const rect = flask.getBoundingClientRect();
+          const inside =
+            mouseX >= rect.left && mouseX <= rect.right &&
+            mouseY >= rect.top && mouseY <= rect.bottom;
+
+          if (inside) flask.classList.add('lit');
+          else flask.classList.remove('lit');
+        });
+
+        requestAnimationFrame(checkHover);
+      }
+
+      checkHover();
     }
 
-    checkHover();
-
-    // ===== 🌌 ПАРАЛЛАКС + 🌀 БЛЮР =====
+    // ===== 🌌 ПАРАЛЛАКС + 🌀 БЛЮР (только ПК) =====
     const isDesktop = window.innerWidth >= 768;
     const PARALLAX_STRENGTH = 18;
     const SPEED_THRESHOLD = 15;
@@ -900,7 +957,7 @@
     let currentBlur = 0;
     let targetBlur = 0;
 
-    if (isDesktop) {
+    if (isDesktop && !isMobile) {
       window.addEventListener('mousemove', (e) => {
         if (document.body.classList.contains('locked')) return;
 
@@ -956,52 +1013,54 @@
       animateBlur();
     }
 
-    // ===== 🖱️ Клик по ноутбуку =====
-    laptop.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (laptopMenu.classList.contains('show')) return;
-
-      laptop.classList.remove('shake');
-      void laptop.offsetWidth;
-      laptop.classList.add('shake');
-      setTimeout(() => laptop.classList.remove('shake'), 400);
-
-      laptopMenu.classList.add('show');
-    });
-
-    // ===== 🖱️ Клик по колбам =====
-    flasks.forEach(flask => {
-      flask.addEventListener('click', (e) => {
+    // ===== 🖱️ Клик по ноутбуку (только ПК) =====
+    if (!isMobile) {
+      laptop.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (laptopMenu.classList.contains('show')) return;
 
-        flask.classList.remove('shake');
-        void flask.offsetWidth;
-        flask.classList.add('shake');
-        setTimeout(() => flask.classList.remove('shake'), 400);
+        laptop.classList.remove('shake');
+        void laptop.offsetWidth;
+        laptop.classList.add('shake');
+        setTimeout(() => laptop.classList.remove('shake'), 400);
+
+        laptopMenu.classList.add('show');
       });
-    });
 
-    // ===== 🚫 Клик по кнопкам меню =====
-    document.querySelectorAll('.laptop-menu-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      // Клик по колбам
+      flasks.forEach(flask => {
+        flask.addEventListener('click', (e) => {
+          e.stopPropagation();
+
+          flask.classList.remove('shake');
+          void flask.offsetWidth;
+          flask.classList.add('shake');
+          setTimeout(() => flask.classList.remove('shake'), 400);
+        });
+      });
+
+      // Клик по кнопкам меню
+      document.querySelectorAll('.laptop-menu-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          console.log('Кнопка нажата:', btn.dataset.btn);
+
+          if (btn.dataset.btn === '1') {
+            goToMolecules();
+          }
+        });
+      });
+
+      document.querySelector('.laptop-menu-circle').addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('Кнопка нажата:', btn.dataset.btn);
+      });
 
-        if (btn.dataset.btn === '1') {
-          goToMolecules();
+      document.addEventListener('click', (e) => {
+        if (!laptop.contains(e.target) && !laptopMenu.contains(e.target)) {
+          laptopMenu.classList.remove('show');
         }
       });
-    });
-
-    document.querySelector('.laptop-menu-circle').addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!laptop.contains(e.target) && !laptopMenu.contains(e.target)) {
-        laptopMenu.classList.remove('show');
-      }
-    });
+    }
 
     // ===== 🎬 Переход на molecules.html =====
     function goToMolecules() {
