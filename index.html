@@ -152,6 +152,12 @@
     pointer-events: none !important;
   }
 
+  /* 🚫 На мобильных — убираем cursor: pointer */
+  body.mobile .laptop,
+  body.mobile .flask {
+    cursor: default;
+  }
+
   /* ===== 🪑 Стол ===== */
   .table {
     position: absolute;
@@ -762,6 +768,22 @@
   </div>
 
   <script>
+    // ============================================================
+    // 🤖 ОПРЕДЕЛЯЕМ УСТРОЙСТВО
+    // ============================================================
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream;
+    const isMobile = isAndroid || isIOS;
+
+    if (isAndroid) document.body.classList.add('android');
+    if (isIOS) document.body.classList.add('ios');
+    if (isMobile) document.body.classList.add('mobile');
+
+    console.log('Android:', isAndroid, '| iOS:', isIOS, '| Mobile:', isMobile);
+
+    // ============================================================
+    // 🎯 ОСНОВНОЙ КОД
+    // ============================================================
     const loader     = document.getElementById('loader');
     const text1      = document.getElementById('text1');
     const text2      = document.getElementById('text2');
@@ -776,10 +798,8 @@
     const isFirstVisit = !sessionStorage.getItem('visited');
 
     if (isFirstVisit) {
-      // ✅ Первый заход — показываем интро
       sessionStorage.setItem('visited', 'true');
 
-      // ===== 🎬 Интро =====
       setTimeout(() => { loader.classList.add('hide'); }, 1200);
       setTimeout(() => { text1.classList.add('show'); }, 1450);
       setTimeout(() => {
@@ -797,14 +817,12 @@
       }, 4000);
 
     } else {
-      // 🔁 Возврат с molecules.html — пропускаем интро
       document.body.classList.add('skip-intro');
 
-      // Сразу показываем сайт
       setTimeout(() => {
         topbar.classList.add('show');
         table.classList.add('show');
-      }, 100);   // ← почти мгновенно
+      }, 100);
     }
 
     // ===== 💡 Подсветка =====
@@ -822,6 +840,12 @@
     });
 
     function checkHover() {
+      // 🚫 На мобильных подсветка не работает
+      if (isMobile) {
+        requestAnimationFrame(checkHover);
+        return;
+      }
+
       if (!laptopMenu.classList.contains('show')) {
         const rect = laptop.getBoundingClientRect();
         const inside =
