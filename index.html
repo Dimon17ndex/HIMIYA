@@ -675,8 +675,23 @@
     opacity: 0.9;
     transition: all 0.25s ease;
   }
-  .dots-btn:hover span,
-  .dots-btn:active span { opacity: 1; transform: scale(1.3); }
+
+  /* 💡 Эффект точек — ТОЛЬКО для устройств с настоящим курсором (ПК) */
+  @media (hover: hover) and (pointer: fine) {
+    .dots-btn:hover span,
+    .dots-btn:active span {
+      opacity: 1;
+      transform: scale(1.3);
+    }
+  }
+
+  /* 🚫 На мобильных — убираем ВСЕ эффекты точек */
+  body.mobile .dots-btn span,
+  body.mobile .dots-btn:hover span,
+  body.mobile .dots-btn:active span {
+    opacity: 0.9 !important;
+    transform: none !important;
+  }
 </style>
 </head>
 <body>
