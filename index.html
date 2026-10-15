@@ -30,7 +30,6 @@
     align-items: center;
   }
 
-  /* ===== 🎬 Финальное затухание страницы ===== */
   body.fade-out {
     transition: opacity 1.2s ease;
     opacity: 0;
@@ -110,7 +109,6 @@
     transition: opacity 0.3s ease, filter 0.3s ease;
   }
 
-  /* 🚫 Скрываем интро, если заход не первый */
   body.skip-intro .loader,
   body.skip-intro .intro-text {
     display: none;
@@ -144,12 +142,10 @@
     pointer-events: auto;
   }
 
-  /* 🚫 ПК-сцена СКРЫТА на мобильных */
   body.mobile .scene {
     display: none !important;
   }
 
-  /* 🚫 Когда всё некликабельно */
   body.locked .scene,
   body.locked .scene *,
   body.locked .topbar,
@@ -171,7 +167,6 @@
     transition: opacity 1s ease 0.3s;
   }
 
-  /* Показываем ТОЛЬКО на мобильных */
   body.mobile .mobile-content {
     display: flex;
   }
@@ -180,7 +175,6 @@
     opacity: 1;
   }
 
-  /* Контейнер кнопок */
   .mobile-buttons {
     display: flex;
     flex-direction: column;
@@ -189,7 +183,6 @@
     max-width: 320px;
   }
 
-  /* Крупные кнопки */
   .mobile-btn {
     width: 100%;
     padding: 22px 24px;
@@ -205,17 +198,13 @@
     cursor: pointer;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 
-    /* Каскадное появление снизу вверх */
     opacity: 0;
     transform: translateY(20px);
     animation: mobileBtnAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 
-  /* Кнопка 1 (Молекулы) — первая, снизу */
   .mobile-btn:nth-child(1) { animation-delay: 0.1s; }
-  /* Кнопка 2 — вторая */
   .mobile-btn:nth-child(2) { animation-delay: 0.2s; }
-  /* Кнопка 3 — третья, сверху */
   .mobile-btn:nth-child(3) { animation-delay: 0.3s; }
 
   @keyframes mobileBtnAppear {
@@ -252,7 +241,6 @@
     transform: translate(-50%, -50%) scale(1);
   }
 
-  /* Столешница */
   .table-top {
     position: absolute;
     top: 0;
@@ -266,7 +254,6 @@
       inset 0 -2px 0 rgba(0, 0, 0, 0.08);
   }
 
-  /* Ножки */
   .table-leg {
     position: absolute;
     top: 6%;
@@ -677,7 +664,6 @@
     transform: scale(0.97) !important;
   }
 
-  /* 🎬 КАСКАД СНИЗУ ВВЕРХ */
   .laptop-menu.show .laptop-menu-btn:nth-child(3) {
     animation: btnAppear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s forwards;
   }
@@ -748,7 +734,6 @@
     transition: all 0.25s ease;
   }
 
-  /* 💡 Эффект точек — ТОЛЬКО для ПК */
   @media (hover: hover) and (pointer: fine) {
     .dots-btn:hover span,
     .dots-btn:active span {
@@ -757,12 +742,92 @@
     }
   }
 
-  /* 🚫 На мобильных — убираем эффекты точек */
   body.mobile .dots-btn span,
   body.mobile .dots-btn:hover span,
   body.mobile .dots-btn:active span {
     opacity: 0.9 !important;
     transform: none !important;
+  }
+
+  /* ============================================================
+     📋 ПЛАШКА "О ПРОЕКТЕ" — БЫСТРАЯ
+     ============================================================ */
+  .info-panel {
+    position: fixed;
+    top: 68px;
+    right: 22px;
+    z-index: 35;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px 8px 10px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
+
+    transform-style: preserve-3d;
+    transform-origin: center center;
+
+    opacity: 0;
+    transform: scale(0.7) rotateX(0deg);
+    pointer-events: none;
+
+    /* ⚡ Быстрое появление */
+    transition:
+      opacity 0.18s ease,
+      transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* 🎬 ПОЯВЛЕНИЕ — быстрое с bounce */
+  .info-panel.show {
+    opacity: 1;
+    transform: scale(1) rotateX(0deg);
+    pointer-events: auto;
+    transition:
+      opacity 0.18s ease,
+      transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* 🎬 ИСЧЕЗНОВЕНИЕ — быстрое с разворотом + сворачивание */
+  .info-panel.hide {
+    opacity: 0;
+    transform: scale(0.4, 1) rotateX(20deg);
+    transition:
+      opacity 0.15s ease,
+      transform 0.25s cubic-bezier(0.4, 0, 0.6, 1);
+    pointer-events: none;
+  }
+
+  /* ⓘ Значок в кружке */
+  .info-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-style: italic;
+    color: #000000;
+    line-height: 1;
+    padding-bottom: 1px;
+    user-select: none;
+  }
+
+  /* Текст "О ПРОЕКТЕ" */
+  .info-text {
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: #000000;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 </style>
 </head>
@@ -782,7 +847,11 @@
     Удачного урока!
   </div>
 
-  <!-- 📱 Мобильный контент: 3 крупные кнопки -->
+  <div class="info-panel" id="infoPanel">
+    <div class="info-icon">i</div>
+    <div class="info-text">О ПРОЕКТЕ</div>
+  </div>
+
   <div class="mobile-content" id="mobileContent">
     <div class="mobile-buttons">
       <button class="mobile-btn" data-btn="1">Молекулы</button>
@@ -791,7 +860,6 @@
     </div>
   </div>
 
-  <!-- 🎬 Сцена для ПК -->
   <div class="scene" id="scene">
 
     <div class="table" id="table">
@@ -865,9 +933,6 @@
   </div>
 
   <script>
-    // ============================================================
-    // 🤖 ОПРЕДЕЛЯЕМ УСТРОЙСТВО
-    // ============================================================
     const isAndroid = /Android/i.test(navigator.userAgent);
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream;
     const isMobile = isAndroid || isIOS;
@@ -876,11 +941,6 @@
     if (isIOS) document.body.classList.add('ios');
     if (isMobile) document.body.classList.add('mobile');
 
-    console.log('Android:', isAndroid, '| iOS:', isIOS, '| Mobile:', isMobile);
-
-    // ============================================================
-    // 🎯 ОСНОВНОЙ КОД
-    // ============================================================
     const loader        = document.getElementById('loader');
     const text1         = document.getElementById('text1');
     const text2         = document.getElementById('text2');
@@ -891,14 +951,13 @@
     const flasks        = document.querySelectorAll('.flask');
     const scene         = document.getElementById('scene');
     const mobileContent = document.getElementById('mobileContent');
+    const infoPanel     = document.getElementById('infoPanel');
 
-    // ===== 🎯 Проверяем, заходим первый раз или возвращаемся =====
     const isFirstVisit = !sessionStorage.getItem('visited');
 
     if (isFirstVisit) {
       sessionStorage.setItem('visited', 'true');
 
-      // Интро
       setTimeout(() => { loader.classList.add('hide'); }, 1200);
       setTimeout(() => { text1.classList.add('show'); }, 1450);
       setTimeout(() => {
@@ -911,35 +970,20 @@
         text2.classList.add('hide');
       }, 3800);
 
-      // После интро — показываем контент
       setTimeout(() => {
         topbar.classList.add('show');
-
-        if (isMobile) {
-          mobileContent.classList.add('show');
-        } else {
-          table.classList.add('show');
-        }
+        if (isMobile) mobileContent.classList.add('show');
+        else table.classList.add('show');
       }, 4000);
 
     } else {
-      // Возврат — пропускаем интро
       document.body.classList.add('skip-intro');
-
       setTimeout(() => {
         topbar.classList.add('show');
-
-        if (isMobile) {
-          mobileContent.classList.add('show');
-        } else {
-          table.classList.add('show');
-        }
+        if (isMobile) mobileContent.classList.add('show');
+        else table.classList.add('show');
       }, 100);
     }
-
-    // ============================================================
-    // 💻 ПК-ЛОГИКА (не работает на мобильных)
-    // ============================================================
 
     let mouseX = -9999;
     let mouseY = -9999;
@@ -984,7 +1028,6 @@
       checkHover();
     }
 
-    // ===== 🌌 ПАРАЛЛАКС + 🌀 БЛЮР (только ПК) =====
     const isDesktop = window.innerWidth >= 768;
     const PARALLAX_STRENGTH = 18;
     const SPEED_THRESHOLD = 15;
@@ -1017,10 +1060,7 @@
         lastMouseY = e.clientY;
 
         if (speed > SPEED_THRESHOLD) {
-          targetBlur = Math.min(
-            MAX_BLUR,
-            (speed - SPEED_THRESHOLD) * SPEED_TO_BLUR
-          );
+          targetBlur = Math.min(MAX_BLUR, (speed - SPEED_THRESHOLD) * SPEED_TO_BLUR);
         } else {
           targetBlur = 0;
         }
@@ -1036,23 +1076,19 @@
       function animateBlur() {
         if (!document.body.classList.contains('locked')) {
           currentBlur += (targetBlur - currentBlur) * 0.25;
-
           if (currentBlur < 0.05) currentBlur = 0;
-
           if (currentBlur > 0) {
             scene.style.filter = `blur(${currentBlur}px)`;
           } else {
             scene.style.filter = '';
           }
         }
-
         requestAnimationFrame(animateBlur);
       }
 
       animateBlur();
     }
 
-    // ===== 🖱️ Клик по ноутбуку (только ПК) =====
     if (!isMobile) {
       laptop.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1069,7 +1105,6 @@
       flasks.forEach(flask => {
         flask.addEventListener('click', (e) => {
           e.stopPropagation();
-
           flask.classList.remove('shake');
           void flask.offsetWidth;
           flask.classList.add('shake');
@@ -1077,15 +1112,10 @@
         });
       });
 
-      // Клик по ПК-кнопкам меню
       document.querySelectorAll('.laptop-menu-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          console.log('ПК-кнопка:', btn.dataset.btn);
-
-          if (btn.dataset.btn === '1') {
-            goToMolecules();
-          }
+          if (btn.dataset.btn === '1') goToMolecules();
         });
       });
 
@@ -1100,22 +1130,40 @@
       });
     }
 
-    // ============================================================
-    // 📱 МОБИЛЬНАЯ ЛОГИКА — те же функции
-    // ============================================================
     document.querySelectorAll('.mobile-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('Мобильная кнопка:', btn.dataset.btn);
-
-        // 🎯 Те же функции, что и на ПК
-        if (btn.dataset.btn === '1') {
-          goToMolecules();
-        }
+        if (btn.dataset.btn === '1') goToMolecules();
       });
     });
 
-    // ===== 🎬 Переход на molecules.html =====
+    // ============================================================
+    // 📋 ПЛАШКА "О ПРОЕКТЕ"
+    // ============================================================
+    let infoPanelOpen = false;
+
+    function openMenu() {
+      infoPanelOpen = !infoPanelOpen;
+
+      if (infoPanelOpen) {
+        infoPanel.classList.remove('hide');
+        void infoPanel.offsetWidth;
+        infoPanel.classList.add('show');
+      } else {
+        infoPanel.classList.remove('show');
+        infoPanel.classList.add('hide');
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const dotsBtn = document.querySelector('.dots-btn');
+      if (!infoPanel.contains(e.target) && !dotsBtn.contains(e.target)) {
+        infoPanel.classList.remove('show');
+        infoPanel.classList.add('hide');
+        infoPanelOpen = false;
+      }
+    });
+
     function goToMolecules() {
       if (laptopMenu) laptopMenu.classList.remove('show');
       document.body.classList.add('locked');
@@ -1126,8 +1174,6 @@
         window.location.href = 'molecules.html';
       }, 1200);
     }
-
-    function openMenu() { console.log('Меню открыто'); }
   </script>
 </body>
 </html>
