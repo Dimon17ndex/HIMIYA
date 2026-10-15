@@ -157,7 +157,7 @@
     pointer-events: none !important;
   }
 
-  /* ===== 📱 Мобильный контент (появится позже) ===== */
+  /* ===== 📱 Мобильный контент ===== */
   .mobile-content {
     position: fixed;
     inset: 0;
@@ -180,13 +180,54 @@
     opacity: 1;
   }
 
-  /* Плейсхолдер — потом заменишь на свой контент */
-  .mobile-content-placeholder {
-    color: rgba(255, 255, 255, 0.35);
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    line-height: 1.5;
+  /* Контейнер кнопок */
+  .mobile-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  /* Крупные кнопки */
+  .mobile-btn {
+    width: 100%;
+    padding: 22px 24px;
+    background: #ffffff;
+    color: #000;
+    border: none;
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+    /* Каскадное появление снизу вверх */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: mobileBtnAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* Кнопка 1 (Молекулы) — первая, снизу */
+  .mobile-btn:nth-child(1) { animation-delay: 0.1s; }
+  /* Кнопка 2 — вторая */
+  .mobile-btn:nth-child(2) { animation-delay: 0.2s; }
+  /* Кнопка 3 — третья, сверху */
+  .mobile-btn:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes mobileBtnAppear {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .mobile-btn:active {
+    transform: scale(0.96);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
   /* ===== 🪑 Стол ===== */
@@ -741,11 +782,12 @@
     Удачного урока!
   </div>
 
-  <!-- 📱 Мобильный контент (появится после лоадера) -->
+  <!-- 📱 Мобильный контент: 3 крупные кнопки -->
   <div class="mobile-content" id="mobileContent">
-    <div class="mobile-content-placeholder">
-      📱 Мобильная версия<br>
-      (контент добавим позже)
+    <div class="mobile-buttons">
+      <button class="mobile-btn" data-btn="1">Молекулы</button>
+      <button class="mobile-btn" data-btn="2">Кнопка 2</button>
+      <button class="mobile-btn" data-btn="3">Кнопка 3</button>
     </div>
   </div>
 
@@ -839,15 +881,15 @@
     // ============================================================
     // 🎯 ОСНОВНОЙ КОД
     // ============================================================
-    const loader     = document.getElementById('loader');
-    const text1      = document.getElementById('text1');
-    const text2      = document.getElementById('text2');
-    const topbar     = document.getElementById('topbar');
-    const table      = document.getElementById('table');
-    const laptop     = document.getElementById('laptop');
-    const laptopMenu = document.getElementById('laptopMenu');
-    const flasks     = document.querySelectorAll('.flask');
-    const scene      = document.getElementById('scene');
+    const loader        = document.getElementById('loader');
+    const text1         = document.getElementById('text1');
+    const text2         = document.getElementById('text2');
+    const topbar        = document.getElementById('topbar');
+    const table         = document.getElementById('table');
+    const laptop        = document.getElementById('laptop');
+    const laptopMenu    = document.getElementById('laptopMenu');
+    const flasks        = document.querySelectorAll('.flask');
+    const scene         = document.getElementById('scene');
     const mobileContent = document.getElementById('mobileContent');
 
     // ===== 🎯 Проверяем, заходим первый раз или возвращаемся =====
@@ -874,10 +916,8 @@
         topbar.classList.add('show');
 
         if (isMobile) {
-          // 📱 На мобильных — показываем мобильный контент
           mobileContent.classList.add('show');
         } else {
-          // 💻 На ПК — показываем сцену со столом
           table.classList.add('show');
         }
       }, 4000);
@@ -901,7 +941,6 @@
     // 💻 ПК-ЛОГИКА (не работает на мобильных)
     // ============================================================
 
-    // ===== 💡 Подсветка (только ПК) =====
     let mouseX = -9999;
     let mouseY = -9999;
 
@@ -1027,7 +1066,6 @@
         laptopMenu.classList.add('show');
       });
 
-      // Клик по колбам
       flasks.forEach(flask => {
         flask.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -1039,11 +1077,11 @@
         });
       });
 
-      // Клик по кнопкам меню
+      // Клик по ПК-кнопкам меню
       document.querySelectorAll('.laptop-menu-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          console.log('Кнопка нажата:', btn.dataset.btn);
+          console.log('ПК-кнопка:', btn.dataset.btn);
 
           if (btn.dataset.btn === '1') {
             goToMolecules();
@@ -1062,11 +1100,26 @@
       });
     }
 
+    // ============================================================
+    // 📱 МОБИЛЬНАЯ ЛОГИКА — те же функции
+    // ============================================================
+    document.querySelectorAll('.mobile-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log('Мобильная кнопка:', btn.dataset.btn);
+
+        // 🎯 Те же функции, что и на ПК
+        if (btn.dataset.btn === '1') {
+          goToMolecules();
+        }
+      });
+    });
+
     // ===== 🎬 Переход на molecules.html =====
     function goToMolecules() {
-      laptopMenu.classList.remove('show');
+      if (laptopMenu) laptopMenu.classList.remove('show');
       document.body.classList.add('locked');
-      laptop.classList.remove('lit');
+      if (laptop) laptop.classList.remove('lit');
       document.body.classList.add('fade-out');
 
       setTimeout(() => {
