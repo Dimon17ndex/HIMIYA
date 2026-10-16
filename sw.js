@@ -1,17 +1,17 @@
 // sw.js — лежит в корне сайта
-const CACHE_NAME = 'chemistry-v1';
+// Логика: страницы НЕ кэшируются, при отсутствии сети → только offline.html
+
+const CACHE_NAME = 'chemistry-offline-v1';
 const OFFLINE_URL = './offline.html';
 
-// Файлы, которые кэшируем при первой установке
+// Кэшируем ТОЛЬКО страницу ошибки
 const PRECACHE_URLS = [
-  './',
-  './index.html',
-  './about.html',
-  './molecules.html',
   './offline.html'
 ];
 
-// Установка: предварительно кэшируем основные страницы
+// ============================================================
+// УСТАНОВКА — сохраняем только offline.html
+// ============================================================
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
@@ -25,7 +25,9 @@ self.addEventListener('install', event => {
   );
 });
 
-// Активация: удаляем старые кэши (на случай смены CACHE_NAME)
+// ============================================================
+// АКТИВАЦИЯ — удаляем все старые кэши
+// ============================================================
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
@@ -36,42 +38,29 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Перехват запросов
+// ============================================================
+// ПЕРЕХВАТ ЗАПРОСОВ
+// ============================================================
 self.addEventListener('fetch', event => {
   const req = event.request;
 
   // Только GET
   if (req.method !== 'GET') return;
 
-  // 🟢 HTML-страницы: сначала СЕТЬ, при неудаче — кэш (или offline.html)
+  // 🌐 Переход по страницам (index, about, molecules и т.д.):
+  //    - Сеть → отдаём страницу как обычно.
+  //    - Сети нет → отдаём offline.html (НЕ кэшированную страницу).
   if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(req)
-        .then(res => {
-          // Обновляем кэш свежей версией
-          const copy = res.clone();
-          caches.open(CACHE_NAME).then(c => c.put(req, copy));
-          return res;
-        })
-        .catch(() =>
-          caches.match(req).then(cached =>
-            cached || caches.match(OFFLINE_URL)
-          )
-        )
+      fetch(req).catch(() => caches.match(OFFLINE_URL))
     );
     return;
   }
 
-  // 🟡 Остальные ресурсы (css, js, картинки): сначала КЭШ, потом сеть
+  // 🟡 Прочие ресурсы (CSS, JS, картинки):
+  //    сначала кэш, если нет — сеть. HTML-страницы сюда не попадают,
+  //    потому что они идут с mode === 'navigate'.
   event.respondWith(
-    caches.match(req).then(cached => {
-      if (cached) return cached;
-      return fetch(req).then(res => {
-        // Кэшируем новые ресурсы на лету
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then(c => c.put(req, copy));
-        return res;
-      }).catch(() => cached);
-    })
+    caches.match(req).then(cached => cached || fetch(req))
   );
 });
