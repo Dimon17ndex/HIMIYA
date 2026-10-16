@@ -133,9 +133,9 @@
       linear-gradient(180deg, #0a0a0a 0%, #030303 100%);
   }
 
-  /* ===== 🆕 ФОТО ПРЕПОДАВАТЕЛЯ НА ПК — СЛЕВА ВВЕРХУ ===== */
+  /* ===== 🆕 ФОТО ПРЕПОДАВАТЕЛЯ НА ПК — ВНУТРИ СЦЕНЫ ===== */
   .desktop-teacher-photo {
-    position: fixed;
+    position: absolute;
     top: 84px;
     left: 22px;
     z-index: 6;
@@ -147,12 +147,11 @@
   }
 
   .desktop-teacher-photo img {
-    width: 160px;
+    width: 320px;
     height: auto;
     display: block;
   }
 
-  /* На мобилке — скрываем ПК-фото */
   body.mobile .desktop-teacher-photo {
     display: none !important;
   }
@@ -1138,11 +1137,6 @@
 
   <div class="bg"></div>
 
-  <!-- 🆕 Фото преподавателя для ПК (левый верхний угол) -->
-  <div class="desktop-teacher-photo">
-    <img src="foto/anna_ermak.png" alt="ЕРМАК АННА НИКОЛАЕВНА">
-  </div>
-
   <div class="loader" id="loader">
     <div class="spinner"></div>
   </div>
@@ -1281,6 +1275,11 @@
   </div>
 
   <div class="scene" id="scene">
+
+    <!-- 🆕 Фото преподавателя на ПК — внутри сцены (получает параллакс и blur) -->
+    <div class="desktop-teacher-photo">
+      <img src="foto/anna_ermak.png" alt="ЕРМАК АННА НИКОЛАЕВНА">
+    </div>
 
     <div class="table" id="table">
       <div class="table-leg tl-3"></div>
