@@ -143,7 +143,13 @@
 
     opacity: 0;
     transform: translateY(12px);
-    animation: mobileHeaderAppear 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .desktop-teacher-photo.show {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .desktop-teacher-photo img {
@@ -1276,7 +1282,7 @@
 
   <div class="scene" id="scene">
 
-    <!-- 🆕 Фото преподавателя на ПК — внутри сцены (получает параллакс и blur) -->
+    <!-- Фото преподавателя на ПК — внутри сцены (получает параллакс и blur) -->
     <div class="desktop-teacher-photo">
       <img src="foto/anna_ermak.png" alt="ЕРМАК АННА НИКОЛАЕВНА">
     </div>
@@ -1405,17 +1411,18 @@
       document.documentElement.classList.add('mobile');
     }
 
-    const loader        = document.getElementById('loader');
-    const text1         = document.getElementById('text1');
-    const text2         = document.getElementById('text2');
-    const topbar        = document.getElementById('topbar');
-    const table         = document.getElementById('table');
-    const laptop        = document.getElementById('laptop');
-    const laptopMenu    = document.getElementById('laptopMenu');
-    const flasks        = document.querySelectorAll('.flask');
-    const scene         = document.getElementById('scene');
-    const mobileContent = document.getElementById('mobileContent');
-    const infoPanel     = document.getElementById('infoPanel');
+    const loader               = document.getElementById('loader');
+    const text1                = document.getElementById('text1');
+    const text2                = document.getElementById('text2');
+    const topbar               = document.getElementById('topbar');
+    const table                = document.getElementById('table');
+    const laptop               = document.getElementById('laptop');
+    const laptopMenu           = document.getElementById('laptopMenu');
+    const flasks               = document.querySelectorAll('.flask');
+    const scene                = document.getElementById('scene');
+    const mobileContent        = document.getElementById('mobileContent');
+    const infoPanel            = document.getElementById('infoPanel');
+    const desktopTeacherPhoto  = document.querySelector('.desktop-teacher-photo');
 
     const isFirstVisit = !sessionStorage.getItem('visited');
 
@@ -1436,16 +1443,24 @@
 
       setTimeout(() => {
         topbar.classList.add('show');
-        if (isMobile) mobileContent.classList.add('show');
-        else table.classList.add('show');
+        if (isMobile) {
+          mobileContent.classList.add('show');
+        } else {
+          table.classList.add('show');
+          if (desktopTeacherPhoto) desktopTeacherPhoto.classList.add('show');
+        }
       }, 4000);
 
     } else {
       document.body.classList.add('skip-intro');
       setTimeout(() => {
         topbar.classList.add('show');
-        if (isMobile) mobileContent.classList.add('show');
-        else table.classList.add('show');
+        if (isMobile) {
+          mobileContent.classList.add('show');
+        } else {
+          table.classList.add('show');
+          if (desktopTeacherPhoto) desktopTeacherPhoto.classList.add('show');
+        }
       }, 100);
     }
 
