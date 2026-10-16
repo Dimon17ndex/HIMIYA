@@ -1,25 +1,22 @@
 // sw.js — лежит в корне сайта
-// Логика: страницы НЕ кэшируются, при отсутствии сети → только offline.html
+// Логика:
+//   • страницы (index, about, molecules) НЕ кэшируются — всегда из сети
+//   • offline.html — network-first: всегда сначала сеть, кэш только при её отсутствии
+//   • остальные ресурсы (css/js/картинки) — cache-first
+//   • версию CACHE_NAME можно больше не поднимать при правках offline.html
 
-const CACHE_NAME = 'chemistry-offline-v1';
+const CACHE_NAME = 'chemistry-offline-v2';
 const OFFLINE_URL = './offline.html';
 
-// Кэшируем ТОЛЬКО страницу ошибки
-const PRECACHE_URLS = [
-  './offline.html'
-];
-
 // ============================================================
-// УСТАНОВКА — сохраняем только offline.html
+// УСТАНОВКА — кэшируем offline.html
 // ============================================================
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
-      Promise.all(
-        PRECACHE_URLS.map(url =>
-          cache.add(url).catch(err => console.warn('Не закэшировано:', url, err))
-        )
+      cache.add(OFFLINE_URL).catch(err =>
+        console.warn('Не закэшировано:', OFFLINE_URL, err)
       )
     )
   );
@@ -48,8 +45,7 @@ self.addEventListener('fetch', event => {
   if (req.method !== 'GET') return;
 
   // 🌐 Переход по страницам (index, about, molecules и т.д.):
-  //    - Сеть → отдаём страницу как обычно.
-  //    - Сети нет → отдаём offline.html (НЕ кэшированную страницу).
+  //    сеть → при провале offline.html
   if (req.mode === 'navigate') {
     event.respondWith(
       fetch(req).catch(() => caches.match(OFFLINE_URL))
@@ -57,9 +53,24 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 🟡 Прочие ресурсы (CSS, JS, картинки):
-  //    сначала кэш, если нет — сеть. HTML-страницы сюда не попадают,
-  //    потому что они идут с mode === 'navigate'.
+  // 🟢 offline.html — network-first:
+  //    сначала сеть, обновляем кэш, при отсутствии сети отдаём старую версию
+  if (req.url.endsWith('offline.html')) {
+    event.respondWith(
+      fetch(req)
+        .then(res => {
+          // обновляем кэш свежей копией
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match(OFFLINE_URL))
+    );
+    return;
+  }
+
+  // 🟡 Остальные ресурсы (CSS, JS, картинки):
+  //    сначала кэш, если нет — сеть
   event.respondWith(
     caches.match(req).then(cached => cached || fetch(req))
   );
