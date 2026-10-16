@@ -58,18 +58,18 @@
   }
   @keyframes fadeIn { to { opacity: 1; } }
 
-  /* ===== 🧪 Молекула вместо молнии ===== */
   .molecule-icon {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
 
   .molecule-icon svg {
-    width: 130px;
+    width: 180px;
     height: auto;
-    filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.15));
+    filter: drop-shadow(0 0 18px rgba(255, 68, 68, 0.25));
+    overflow: visible;
   }
 
   h1 {
@@ -114,19 +114,280 @@
 
   <div class="content">
 
-    <!-- 🧪 Молекула: два серых + один красный -->
     <div class="molecule-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
-        <!-- Связи -->
-        <line x1="50" y1="50" x2="100" y2="50" stroke="rgba(255,255,255,0.85)" stroke-width="6" stroke-linecap="round"/>
-        <line x1="100" y1="50" x2="150" y2="50" stroke="rgba(255,255,255,0.85)" stroke-width="6" stroke-linecap="round"/>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="180" height="180" style="overflow: visible;">
 
-        <!-- Левый серый атом (C) -->
-        <circle cx="50" cy="50" r="22" fill="#888888"/>
-        <!-- Центральный красный атом (O) -->
-        <circle cx="100" cy="50" r="24" fill="#ff4444"/>
-        <!-- Правый серый атом (C) -->
-        <circle cx="150" cy="50" r="22" fill="#888888"/>
+        <!-- ============ ЛЕВАЯ СВЯЗЬ O–H ============ -->
+        <line x1="100" y1="130" x2="44" y2="86"
+              stroke="rgba(220,220,220,0.9)"
+              stroke-width="22"
+              stroke-linecap="round">
+
+          <!-- РАСПАД (1.3 – 3.8s) -->
+          <animate attributeName="x1"
+                   values="100;100;100;52"
+                   keyTimes="0;0.5;0.75;1"
+                   dur="2s" begin="1.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"/>
+          <animate attributeName="y1"
+                   values="130;130;130;88"
+                   keyTimes="0;0.5;0.75;1"
+                   dur="2s" begin="1.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"/>
+          <animate attributeName="x2"
+                   values="44;44;4;52"
+                   keyTimes="0;0.5;0.75;1"
+                   dur="2s" begin="1.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.4 0 0.6 1; 0.25 0.1 0.25 1; 0.4 0 0.6 1"/>
+          <animate attributeName="y2"
+                   values="86;86;46;88"
+                   keyTimes="0;0.5;0.75;1"
+                   dur="2s" begin="1.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.4 0 0.6 1; 0.25 0.1 0.25 1; 0.4 0 0.6 1"/>
+          <animate attributeName="stroke-width"
+                   values="22;22;0"
+                   keyTimes="0;0.3;1"
+                   dur="0.5s" begin="3.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+
+          <!-- ПОЯВЛЕНИЕ: линия раскрывается из середины к O и к H одновременно -->
+          <animate attributeName="x1"
+                   values="52;100"
+                   keyTimes="0;1"
+                   dur="0.5s" begin="5.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.3 0 0.4 1"/>
+          <animate attributeName="y1"
+                   values="88;130"
+                   keyTimes="0;1"
+                   dur="0.5s" begin="5.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.3 0 0.4 1"/>
+          <animate attributeName="x2"
+                   values="52;44"
+                   keyTimes="0;1"
+                   dur="0.5s" begin="5.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.3 0 0.4 1"/>
+          <animate attributeName="y2"
+                   values="88;86"
+                   keyTimes="0;1"
+                   dur="0.5s" begin="5.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.3 0 0.4 1"/>
+          <animate attributeName="stroke-width"
+                   values="0;22"
+                   keyTimes="0;1"
+                   dur="0.5s" begin="5.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.3 0 0.4 1"/>
+        </line>
+
+        <!-- ============ ПРАВАЯ СВЯЗЬ O–H ============ -->
+        <line x1="100" y1="130" x2="156" y2="86"
+              stroke="rgba(220,220,220,0.9)"
+              stroke-width="22"
+              stroke-linecap="round">
+
+          <!-- РАСПАД -->
+          <animate attributeName="x1"
+                   values="100;100;100;148"
+                   keyTimes="0;0.5;0.75;1"
+                   dur="2s" begin="1.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"/>
+          <animate attributeName="y1"
+                   values="130;130;130;88"
+                   keyTimes="0;0.5;0.75;1"
+                   dur="2s" begin="1.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"/>
+          <animate attributeName="x2"
+                   values="156;156;196;148"
+                   keyTimes="0;0.5;0.75;1"
+                   dur="2s" begin="1.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.4 0 0.6 1; 0.25 0.1 0.25 1; 0.4 0 0.6 1"/>
+          <animate attributeName="y2"
+                   values="86;86;46;88"
+                   keyTimes="0;0.5;0.75;1"
+                   dur="2s" begin="1.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.4 0 0.6 1; 0.25 0.1 0.25 1; 0.4 0 0.6 1"/>
+          <animate attributeName="stroke-width"
+                   values="22;22;0"
+                   keyTimes="0;0.3;1"
+                   dur="0.5s" begin="3.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+
+          <!-- ПОЯВЛЕНИЕ: раскрытие из середины (148, 88) -->
+          <animate attributeName="x1"
+                   values="148;100"
+                   keyTimes="0;1"
+                   dur="0.5s" begin="5.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.3 0 0.4 1"/>
+          <animate attributeName="y1"
+                   values="88;130"
+                   keyTimes="0;1"
+                   dur="0.5s" begin="5.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.3 0 0.4 1"/>
+          <animate attributeName="x2"
+                   values="148;156"
+                   keyTimes="0;1"
+                   dur="0.5s" begin="5.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.3 0 0.4 1"/>
+          <animate attributeName="y2"
+                   values="88;86"
+                   keyTimes="0;1"
+                   dur="0.5s" begin="5.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.3 0 0.4 1"/>
+          <animate attributeName="stroke-width"
+                   values="0;22"
+                   keyTimes="0;1"
+                   dur="0.5s" begin="5.3s" fill="freeze"
+                   calcMode="spline"
+                   keySplines="0.3 0 0.4 1"/>
+        </line>
+
+        <!-- ============ ЛЕВЫЙ ВОДОРОД ============ -->
+        <g>
+          <animateTransform attributeName="transform"
+                            type="translate"
+                            values="0 0; 2 0; 2 -2; 0 -2; -2 -2; -2 0; -2 2; 0 2; 2 2; 0 0"
+                            dur="0.35s" begin="1.2s" repeatCount="8"
+                            fill="freeze" calcMode="linear"/>
+
+          <circle cx="44" cy="86" r="20" fill="#ffffff">
+            <!-- РАСПАД -->
+            <animate attributeName="cx"
+                     values="44;44;4;4"
+                     keyTimes="0;0.5;0.75;1"
+                     dur="2s" begin="1.3s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.4 0 0.6 1; 0.25 0.1 0.25 1; 0.4 0 0.6 1"/>
+            <animate attributeName="cy"
+                     values="86;86;46;46"
+                     keyTimes="0;0.5;0.75;1"
+                     dur="2s" begin="1.3s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.4 0 0.6 1; 0.25 0.1 0.25 1; 0.4 0 0.6 1"/>
+            <animate attributeName="opacity"
+                     values="1;1;0"
+                     keyTimes="0;0.1;1"
+                     dur="1.2s" begin="3.3s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+
+            <!-- ПОЯВЛЕНИЕ -->
+            <animate attributeName="cx"
+                     values="4;44"
+                     keyTimes="0;1"
+                     dur="0.5s" begin="5.2s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.3 0 0.4 1"/>
+            <animate attributeName="cy"
+                     values="60;86"
+                     keyTimes="0;1"
+                     dur="0.5s" begin="5.2s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.3 0 0.4 1"/>
+            <animate attributeName="opacity"
+                     values="0;1"
+                     keyTimes="0;1"
+                     dur="0.5s" begin="5.2s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.3 0 0.4 1"/>
+          </circle>
+        </g>
+
+        <!-- ============ ПРАВЫЙ ВОДОРОД ============ -->
+        <g>
+          <animateTransform attributeName="transform"
+                            type="translate"
+                            values="0 0; -2 0; -2 -2; 0 -2; 2 -2; 2 0; 2 2; 0 2; -2 2; 0 0"
+                            dur="0.42s" begin="1.2s" repeatCount="6"
+                            fill="freeze" calcMode="linear"/>
+
+          <circle cx="156" cy="86" r="20" fill="#ffffff">
+            <!-- РАСПАД -->
+            <animate attributeName="cx"
+                     values="156;156;196;196"
+                     keyTimes="0;0.5;0.75;1"
+                     dur="2s" begin="1.3s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.4 0 0.6 1; 0.25 0.1 0.25 1; 0.4 0 0.6 1"/>
+            <animate attributeName="cy"
+                     values="86;86;46;46"
+                     keyTimes="0;0.5;0.75;1"
+                     dur="2s" begin="1.3s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.4 0 0.6 1; 0.25 0.1 0.25 1; 0.4 0 0.6 1"/>
+            <animate attributeName="opacity"
+                     values="1;1;0"
+                     keyTimes="0;0.1;1"
+                     dur="1.2s" begin="3.3s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+
+            <!-- ПОЯВЛЕНИЕ -->
+            <animate attributeName="cx"
+                     values="196;156"
+                     keyTimes="0;1"
+                     dur="0.5s" begin="5.2s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.3 0 0.4 1"/>
+            <animate attributeName="cy"
+                     values="60;86"
+                     keyTimes="0;1"
+                     dur="0.5s" begin="5.2s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.3 0 0.4 1"/>
+            <animate attributeName="opacity"
+                     values="0;1"
+                     keyTimes="0;1"
+                     dur="0.5s" begin="5.2s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.3 0 0.4 1"/>
+          </circle>
+        </g>
+
+        <!-- ============ КИСЛОРОД ============ -->
+        <g>
+          <animateTransform attributeName="transform"
+                            type="translate"
+                            values="0 0; 1 0; 1 -1; 0 -1; -1 -1; -1 0; -1 1; 0 1; 1 1; 0 0"
+                            dur="0.6s" begin="1.2s" repeatCount="4"
+                            fill="freeze" calcMode="linear"/>
+
+          <animateTransform attributeName="transform"
+                            type="translate"
+                            values="0 0; 0 -22; 0 0"
+                            keyTimes="0;0.5;1"
+                            dur="0.5s" begin="5.2s" fill="freeze"
+                            additive="sum"
+                            calcMode="spline"
+                            keySplines="0.3 0 0.5 1; 0.4 0 0.6 1"/>
+
+          <circle cx="100" cy="130" r="34" fill="#ff4444">
+            <animate attributeName="r"
+                     values="34;44;34"
+                     keyTimes="0;0.5;1"
+                     dur="0.5s" begin="5.2s" fill="freeze"
+                     calcMode="spline"
+                     keySplines="0.3 0 0.5 1; 0.4 0 0.6 1"/>
+          </circle>
+        </g>
+
       </svg>
     </div>
 
@@ -134,5 +395,47 @@
     <p>Проверьте интернет-соединение и попробуйте снова</p>
     <button class="retry" onclick="location.reload()">Обновить</button>
   </div>
+
+  <!--
+    🔄 ЗАЦИКЛИВАНИЕ SMIL-АНИМАЦИЙ
+    Каждые 6 секунд возвращаем SVG-время в 0.
+    Это перезапускает все <animate> и <animateTransform> внутри SVG.
+    Значение 6000 мс = 1s (пауза при появлении) + 5s (полный таймлайн распада и сборки).
+    Если поменяешь тайминги в SVG — подгони это число.
+  -->
+  <script>
+    (function () {
+      const svg = document.querySelector('.molecule-icon svg');
+      if (!svg || typeof svg.setCurrentTime !== 'function') return;
+
+      const CYCLE_MS = 6000;
+
+      function restart() {
+        try {
+          svg.setCurrentTime(0);
+        } catch (e) {
+          // на всякий случай
+        }
+      }
+
+      // первый перезапуск — через CYCLE_MS после загрузки
+      let timerId = setTimeout(function tick() {
+        restart();
+        timerId = setTimeout(tick, CYCLE_MS);
+      }, CYCLE_MS);
+
+      // если вкладка ушла в фон и вернулась — сразу перезапускаем
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          clearTimeout(timerId);
+          restart();
+          timerId = setTimeout(function tick() {
+            restart();
+            timerId = setTimeout(tick, CYCLE_MS);
+          }, CYCLE_MS);
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
