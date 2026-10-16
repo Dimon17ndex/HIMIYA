@@ -30,6 +30,14 @@
     align-items: center;
   }
 
+  html.mobile, body.mobile {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: auto;
+    min-height: 100%;
+    display: block;
+  }
+
   body.fade-out {
     transition: opacity 1.2s ease;
     opacity: 0;
@@ -155,13 +163,13 @@
 
   /* ===== 📱 Мобильный контент ===== */
   .mobile-content {
-    position: fixed;
-    inset: 0;
+    position: relative;
     z-index: 8;
     display: none;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
-    padding: 80px 24px 24px;
+    padding: 100px 24px 80px;
     text-align: center;
     opacity: 0;
     transition: opacity 1s ease 0.3s;
@@ -175,37 +183,98 @@
     opacity: 1;
   }
 
+  /* ===== 📱 Заголовок ХИМИЯ ===== */
+  .mobile-header {
+    margin-bottom: 40px;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: mobileHeaderAppear 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.4s forwards;
+  }
+
+  @keyframes mobileHeaderAppear {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .mobile-title {
+    font-size: 2.4rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    margin-bottom: 14px;
+    background: linear-gradient(135deg, #ffffff 0%, #888888 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .mobile-subtitle {
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.55);
+    max-width: 260px;
+    margin: 0 auto;
+  }
+
+  /* ===== 🆕 ФОТО ПРЕПОДАВАТЕЛЯ ===== */
+  .mobile-teacher-photo {
+    width: 100%;
+    max-width: calc(100vw - 48px);
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+
+    opacity: 0;
+    transform: translateY(12px);
+    animation: mobileHeaderAppear 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.55s forwards;
+  }
+
+  .mobile-teacher-photo img {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+    display: block;
+    border-radius: 14px;
+    object-fit: cover;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+
+  /* (стили .mobile-buttons и .mobile-btn оставлены — не используются) */
   .mobile-buttons {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     width: 100%;
-    max-width: 320px;
+    max-width: 260px;
   }
 
   .mobile-btn {
     width: 100%;
-    padding: 22px 24px;
+    padding: 14px 18px;
     background: #ffffff;
     color: #000;
     border: none;
-    border-radius: 16px;
+    border-radius: 12px;
     font-family: inherit;
-    font-size: 1.15rem;
+    font-size: 0.95rem;
     font-weight: 800;
     letter-spacing: 0.02em;
     text-align: center;
     cursor: pointer;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 
     opacity: 0;
     transform: translateY(20px);
     animation: mobileBtnAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 
-  .mobile-btn:nth-child(1) { animation-delay: 0.1s; }
-  .mobile-btn:nth-child(2) { animation-delay: 0.2s; }
-  .mobile-btn:nth-child(3) { animation-delay: 0.3s; }
+  .mobile-btn:nth-child(1) { animation-delay: 0.5s; }
+  .mobile-btn:nth-child(2) { animation-delay: 0.6s; }
+  .mobile-btn:nth-child(3) { animation-delay: 0.7s; }
 
   @keyframes mobileBtnAppear {
     to {
@@ -217,6 +286,195 @@
   .mobile-btn:active {
     transform: scale(0.96);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* (стили .mobile-method оставлены — не используются) */
+  .mobile-method {
+    width: 100%;
+    max-width: calc(100vw - 48px);
+    margin-top: 32px;
+    padding: 16px 20px;
+    border: 1.5px solid #f97316;
+    border-radius: 12px;
+    background: transparent;
+    color: #f97316;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.45;
+    letter-spacing: 0.03em;
+    text-align: center;
+    text-transform: uppercase;
+
+    opacity: 0;
+    transform: translateY(12px);
+    animation: mobileHeaderAppear 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.72s forwards;
+  }
+
+  /* ===== 📚 СЕКЦИЯ "ТЕМЫ" ===== */
+  .mobile-topics {
+    width: 100%;
+    max-width: calc(100vw - 48px);
+    margin-top: 56px;   /* оставляем 56px — не двигаем */
+    text-align: left;
+  }
+
+  .mobile-topics-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: 12px;
+    padding-left: 4px;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: mobileHeaderAppear 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.75s forwards;
+  }
+
+  .mobile-topics-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+  }
+
+  .mobile-topic-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 8px;
+    transition: margin-bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    opacity: 0;
+    transform: translateY(20px);
+    animation: mobileBtnAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .mobile-topic-item.open {
+    margin-bottom: 28px;
+  }
+
+  .mobile-topic-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .mobile-topic-item:nth-child(1)  { animation-delay: 0.80s; }
+  .mobile-topic-item:nth-child(2)  { animation-delay: 0.84s; }
+  .mobile-topic-item:nth-child(3)  { animation-delay: 0.88s; }
+  .mobile-topic-item:nth-child(4)  { animation-delay: 0.92s; }
+  .mobile-topic-item:nth-child(5)  { animation-delay: 0.96s; }
+  .mobile-topic-item:nth-child(6)  { animation-delay: 1.00s; }
+  .mobile-topic-item:nth-child(7)  { animation-delay: 1.04s; }
+  .mobile-topic-item:nth-child(8)  { animation-delay: 1.08s; }
+  .mobile-topic-item:nth-child(9)  { animation-delay: 1.12s; }
+  .mobile-topic-item:nth-child(10) { animation-delay: 1.16s; }
+
+  .mobile-topic-btn {
+    width: 100%;
+    padding: 11px 18px;
+    background: #ffffff;
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+  }
+
+  .mobile-topic-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .mobile-topic-label {
+    flex: 1;
+  }
+
+  .mobile-topic-arrow {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    position: relative;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: rotate(0deg);
+  }
+
+  .mobile-topic-arrow::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    border-left: 2px solid #000;
+    border-top: 2px solid #000;
+    transform: translate(-50%, -30%) rotate(45deg);
+    transform-origin: center;
+  }
+
+  .mobile-topic-item.open .mobile-topic-arrow {
+    transform: rotate(180deg);
+  }
+
+  .mobile-topic-content {
+    width: 100%;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    border: 1.5px solid #ffffff;
+    border-radius: 12px;
+    background: transparent;
+    transition:
+      max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.3s ease,
+      padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0 18px;
+  }
+
+  .mobile-topic-item.open .mobile-topic-content {
+    max-height: 400px;
+    opacity: 1;
+    padding: 14px 18px;
+  }
+
+  .mobile-topic-open-btn {
+    display: block;
+    margin-left: auto;
+    padding: 10px 22px;
+    background: #7c3aed;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.45);
+
+    transition: transform 0.12s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+
+  .mobile-topic-open-btn:hover {
+    background: #8b5cf6;
+  }
+
+  .mobile-topic-open-btn:active {
+    transform: scale(0.96);
+    background: #6d28d9;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
   }
 
   /* ===== 🪑 Стол ===== */
@@ -548,9 +806,12 @@
     left: 8px;
     right: 8px;
     bottom: 8px;
-    background: linear-gradient(180deg, #0d3b66 0%, #1a5a8a 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
     border-radius: 5px;
-    box-shadow: inset 0 0 24px rgba(100, 200, 255, 0.5);
+    box-shadow:
+      inset 0 0 24px rgba(255, 255, 255, 0.9),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    z-index: 1;
   }
 
   .laptop-screen::after {
@@ -558,12 +819,25 @@
     position: absolute;
     top: 8px;
     left: 8px;
-    width: 40%;
-    height: 30%;
+    width: 45%;
+    height: 35%;
     background: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(200, 200, 200, 0.15) 60%,
       transparent 100%);
     border-radius: 5px 0 0 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .laptop-screen-mol {
+    position: absolute;
+    inset: 8px;
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    z-index: 2;
+    pointer-events: none;
+    display: block;
   }
 
   .laptop-base {
@@ -709,6 +983,18 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     user-select: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  body.mobile .brand {
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+  }
+
+  body.mobile .brand.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .dots-btn {
@@ -774,13 +1060,11 @@
     transform: scale(0.7) rotateX(0deg);
     pointer-events: none;
 
-    /* ⚡ Быстрое появление */
     transition:
       opacity 0.18s ease,
       transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  /* 🎬 ПОЯВЛЕНИЕ — быстрое с bounce */
   .info-panel.show {
     opacity: 1;
     transform: scale(1) rotateX(0deg);
@@ -790,7 +1074,6 @@
       transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  /* 🎬 ИСЧЕЗНОВЕНИЕ — быстрое с разворотом + сворачивание */
   .info-panel.hide {
     opacity: 0;
     transform: scale(0.4, 1) rotateX(20deg);
@@ -800,7 +1083,6 @@
     pointer-events: none;
   }
 
-  /* ⓘ Значок в кружке */
   .info-icon {
     flex-shrink: 0;
     width: 20px;
@@ -820,7 +1102,6 @@
     user-select: none;
   }
 
-  /* Текст "О ПРОЕКТЕ" */
   .info-text {
     font-size: 0.9rem;
     font-weight: 400;
@@ -853,10 +1134,122 @@
   </div>
 
   <div class="mobile-content" id="mobileContent">
-    <div class="mobile-buttons">
-      <button class="mobile-btn" data-btn="1">Молекулы</button>
-      <button class="mobile-btn" data-btn="2">Кнопка 2</button>
-      <button class="mobile-btn" data-btn="3">Кнопка 3</button>
+    <div class="mobile-header">
+      <div class="mobile-title">ХИМИЯ</div>
+      <div class="mobile-subtitle">наука о веществах и превращениях</div>
+    </div>
+
+    <!-- 🆕 Фото преподавателя -->
+    <div class="mobile-teacher-photo">
+      <img src="foto/anna_ermak.jpe" alt="ЕРМАК АННА НИКОЛАЕВНА">
+    </div>
+
+    <!-- 📚 СЕКЦИЯ "ТЕМЫ" -->
+    <div class="mobile-topics">
+      <div class="mobile-topics-title">ТЕМЫ</div>
+      <div class="mobile-topics-buttons">
+
+        <div class="mobile-topic-item">
+          <button class="mobile-topic-btn">
+            <span class="mobile-topic-label">Тема 1</span>
+            <span class="mobile-topic-arrow"></span>
+          </button>
+          <div class="mobile-topic-content">
+            <button class="mobile-topic-open-btn">Открыть</button>
+          </div>
+        </div>
+
+        <div class="mobile-topic-item">
+          <button class="mobile-topic-btn">
+            <span class="mobile-topic-label">Тема 2</span>
+            <span class="mobile-topic-arrow"></span>
+          </button>
+          <div class="mobile-topic-content">
+            <button class="mobile-topic-open-btn">Открыть</button>
+          </div>
+        </div>
+
+        <div class="mobile-topic-item">
+          <button class="mobile-topic-btn">
+            <span class="mobile-topic-label">Тема 3</span>
+            <span class="mobile-topic-arrow"></span>
+          </button>
+          <div class="mobile-topic-content">
+            <button class="mobile-topic-open-btn">Открыть</button>
+          </div>
+        </div>
+
+        <div class="mobile-topic-item">
+          <button class="mobile-topic-btn">
+            <span class="mobile-topic-label">Тема 4</span>
+            <span class="mobile-topic-arrow"></span>
+          </button>
+          <div class="mobile-topic-content">
+            <button class="mobile-topic-open-btn">Открыть</button>
+          </div>
+        </div>
+
+        <div class="mobile-topic-item">
+          <button class="mobile-topic-btn">
+            <span class="mobile-topic-label">Тема 5</span>
+            <span class="mobile-topic-arrow"></span>
+          </button>
+          <div class="mobile-topic-content">
+            <button class="mobile-topic-open-btn">Открыть</button>
+          </div>
+        </div>
+
+        <div class="mobile-topic-item">
+          <button class="mobile-topic-btn">
+            <span class="mobile-topic-label">Тема 6</span>
+            <span class="mobile-topic-arrow"></span>
+          </button>
+          <div class="mobile-topic-content">
+            <button class="mobile-topic-open-btn">Открыть</button>
+          </div>
+        </div>
+
+        <div class="mobile-topic-item">
+          <button class="mobile-topic-btn">
+            <span class="mobile-topic-label">Тема 7</span>
+            <span class="mobile-topic-arrow"></span>
+          </button>
+          <div class="mobile-topic-content">
+            <button class="mobile-topic-open-btn">Открыть</button>
+          </div>
+        </div>
+
+        <div class="mobile-topic-item">
+          <button class="mobile-topic-btn">
+            <span class="mobile-topic-label">Тема 8</span>
+            <span class="mobile-topic-arrow"></span>
+          </button>
+          <div class="mobile-topic-content">
+            <button class="mobile-topic-open-btn">Открыть</button>
+          </div>
+        </div>
+
+        <div class="mobile-topic-item">
+          <button class="mobile-topic-btn">
+            <span class="mobile-topic-label">Тема 9</span>
+            <span class="mobile-topic-arrow"></span>
+          </button>
+          <div class="mobile-topic-content">
+            <button class="mobile-topic-open-btn">Открыть</button>
+          </div>
+        </div>
+
+        <div class="mobile-topic-item">
+          <button class="mobile-topic-btn">
+            <span class="mobile-topic-label">Тема 10</span>
+            <span class="mobile-topic-arrow"></span>
+          </button>
+          <div class="mobile-topic-content">
+            <button class="mobile-topic-open-btn">Открыть</button>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 
@@ -893,7 +1286,37 @@
         </div>
 
         <div class="laptop" id="laptop">
-          <div class="laptop-screen"></div>
+          <div class="laptop-screen">
+            <svg class="laptop-screen-mol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 108" preserveAspectRatio="xMidYMid meet">
+              <line x1="80" y1="72" x2="58" y2="48"
+                    stroke="#b8b8b8" stroke-width="7" stroke-linecap="round">
+                <animateTransform attributeName="transform" type="translate"
+                                  values="0 0; 0.6 0; 0.6 -0.6; 0 -0.6; -0.6 -0.6; -0.6 0; -0.6 0.6; 0 0.6; 0.6 0.6; 0 0"
+                                  dur="0.35s" repeatCount="indefinite" calcMode="linear"/>
+              </line>
+              <line x1="80" y1="72" x2="102" y2="48"
+                    stroke="#b8b8b8" stroke-width="7" stroke-linecap="round">
+                <animateTransform attributeName="transform" type="translate"
+                                  values="0 0; -0.6 0; -0.6 -0.6; 0 -0.6; 0.6 -0.6; 0.6 0; 0.6 0.6; 0 0.6; -0.6 0.6; 0 0"
+                                  dur="0.42s" repeatCount="indefinite" calcMode="linear"/>
+              </line>
+              <circle cx="58" cy="48" r="9" fill="#ffffff" stroke="#d0d0d0" stroke-width="1">
+                <animateTransform attributeName="transform" type="translate"
+                                  values="0 0; 0.6 0; 0.6 -0.6; 0 -0.6; -0.6 -0.6; -0.6 0; -0.6 0.6; 0 0.6; 0.6 0.6; 0 0"
+                                  dur="0.35s" repeatCount="indefinite" calcMode="linear"/>
+              </circle>
+              <circle cx="102" cy="48" r="9" fill="#ffffff" stroke="#d0d0d0" stroke-width="1">
+                <animateTransform attributeName="transform" type="translate"
+                                  values="0 0; -0.6 0; -0.6 -0.6; 0 -0.6; 0.6 -0.6; 0.6 0; 0.6 0.6; 0 0.6; -0.6 0.6; 0 0"
+                                  dur="0.42s" repeatCount="indefinite" calcMode="linear"/>
+              </circle>
+              <circle cx="80" cy="72" r="15" fill="#ff4444">
+                <animateTransform attributeName="transform" type="translate"
+                                  values="0 0; 0.4 0; 0.4 -0.4; 0 -0.4; -0.4 -0.4; -0.4 0; -0.4 0.4; 0 0.4; 0.4 0.4; 0 0"
+                                  dur="0.6s" repeatCount="indefinite" calcMode="linear"/>
+              </circle>
+            </svg>
+          </div>
           <div class="laptop-base"></div>
         </div>
       </div>
@@ -935,15 +1358,15 @@
   <script>
     
     // ============================================================
-// 🌐 SERVICE WORKER — офлайн-режим
-// ============================================================
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('SW зарегистрирован:', reg.scope))
-      .catch(err => console.error('SW ошибка:', err));
-  });
-}
+    // 🌐 SERVICE WORKER — офлайн-режим
+    // ============================================================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('SW зарегистрирован:', reg.scope))
+          .catch(err => console.error('SW ошибка:', err));
+      });
+    }
 
     const isAndroid = /Android/i.test(navigator.userAgent);
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream;
@@ -951,7 +1374,10 @@ if ('serviceWorker' in navigator) {
 
     if (isAndroid) document.body.classList.add('android');
     if (isIOS) document.body.classList.add('ios');
-    if (isMobile) document.body.classList.add('mobile');
+    if (isMobile) {
+      document.body.classList.add('mobile');
+      document.documentElement.classList.add('mobile');
+    }
 
     const loader        = document.getElementById('loader');
     const text1         = document.getElementById('text1');
@@ -1142,12 +1568,44 @@ if ('serviceWorker' in navigator) {
       });
     }
 
-    document.querySelectorAll('.mobile-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (btn.dataset.btn === '1') goToMolecules();
+    // ============================================================
+    // 📜 SCROLL-AWARE LOGO (только для мобилки)
+    // ============================================================
+    if (isMobile) {
+      const topbarBrand = document.querySelector('.topbar .brand');
+      const mobileTitle = document.querySelector('.mobile-title');
+
+      if (topbarBrand && mobileTitle) {
+        function updateBrandVisibility() {
+          const rect = mobileTitle.getBoundingClientRect();
+          const isScrolledOut = rect.bottom < 60;
+
+          if (isScrolledOut) {
+            topbarBrand.classList.add('visible');
+          } else {
+            topbarBrand.classList.remove('visible');
+          }
+        }
+
+        window.addEventListener('scroll', updateBrandVisibility, { passive: true });
+        updateBrandVisibility();
+      }
+    }
+
+    // ============================================================
+    // 📚 РАСКРЫТИЕ ТЕМ (только для мобилки)
+    // ============================================================
+    if (isMobile) {
+      document.querySelectorAll('.mobile-topic-item').forEach(item => {
+        const btn = item.querySelector('.mobile-topic-btn');
+        if (!btn) return;
+
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          item.classList.toggle('open');
+        });
       });
-    });
+    }
 
     // ============================================================
     // 📋 ПЛАШКА "О ПРОЕКТЕ"
@@ -1167,17 +1625,11 @@ if ('serviceWorker' in navigator) {
       }
     }
 
-    // 🆕 ПЕРЕХОД НА ABOUT.HTML ПРИ КЛИКЕ НА ПЛАШКУ "О ПРОЕКТЕ"
     infoPanel.addEventListener('click', (e) => {
       e.stopPropagation();
-      
-      // Блокируем всё
       document.body.style.pointerEvents = 'none';
-      
-      // Нежное затухание
       document.body.classList.add('fade-out');
-      
-      // Переход через 1.2s
+
       setTimeout(() => {
         window.location.href = 'about.html';
       }, 1200);
