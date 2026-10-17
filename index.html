@@ -137,7 +137,7 @@
   .floating-molecules-layer {
     position: fixed;
     inset: 0;
-    z-index: 3;                   /* над фоном, под сценой (5) и под контентом (8) */
+    z-index: 3;
     pointer-events: none;
     overflow: hidden;
     perspective: 800px;
@@ -1455,19 +1455,19 @@
     // 🧪 ПЛАВАЮЩИЕ МОЛЕКУЛЫ H₂O (ПК + мобилка)
     // ============================================================
     const moleculesConfig = {
-      startBurst: isMobile ? 10 : 16,         // стартовый бурст
-      startProgressMax: 0.7,                  // стартовая прогрессия (0..max)
-      spawnMin: isMobile ? 800 : 600,         // интервал между спавнами
+      startBurst: isMobile ? 10 : 16,
+      startProgressMax: 0.7,
+      spawnMin: isMobile ? 800 : 600,
       spawnMax: isMobile ? 1600 : 1400,
-      scaleMin: isMobile ? 0.5 : 0.7,         // размер молекул
+      scaleMin: isMobile ? 0.5 : 0.7,
       scaleMax: isMobile ? 1.7 : 2.0,
-      durationMin: isMobile ? 8000 : 9000,    // длительность полёта
+      durationMin: isMobile ? 8000 : 9000,
       durationMax: isMobile ? 16000 : 18000,
-      blurMin: 1.5,                           // минимум blur
-      blurMax: isMobile ? 4 : 4.5             // максимум blur
+      blurMin: 1.5,
+      blurMax: isMobile ? 4 : 4.5
     };
 
-    let spawnActive = false;                  // флаг — сейчас спавнить новые или нет
+    let spawnActive = false;
 
     function createMoleculeSVG(scale) {
       const size = 80;
@@ -1561,7 +1561,7 @@
     let isFirstSpawn = true;
 
     function loopSpawn() {
-      if (!spawnActive) return;  // если спавн остановлен — выходим
+      if (!spawnActive) return;
 
       if (isFirstSpawn) {
         for (let i = 0; i < moleculesConfig.startBurst; i++) {
@@ -1589,7 +1589,6 @@
 
       setTimeout(() => { loader.classList.add('hide'); }, 1200);
 
-      // 🆕 Старт молекул вместе с первым текстом
       setTimeout(() => {
         text1.classList.add('show');
         spawnActive = true;
@@ -1607,10 +1606,9 @@
         text2.classList.add('hide');
       }, 3800);
 
-      // 🆕 Показ объектов — прекращаем спавн новых молекул
       setTimeout(() => {
         topbar.classList.add('show');
-        spawnActive = false;   // 🛑 новые молекулы больше не создаются
+        spawnActive = false;
         if (isMobile) {
           mobileContent.classList.add('show');
         } else {
@@ -1620,6 +1618,7 @@
       }, 4000);
 
     } else {
+      // 🚫 При перезагрузке — БЕЗ молекул, БЕЗ интро, сразу финальный экран
       document.body.classList.add('skip-intro');
       setTimeout(() => {
         topbar.classList.add('show');
@@ -1630,12 +1629,6 @@
           if (desktopTeacherPhoto) desktopTeacherPhoto.classList.add('show');
         }
       }, 100);
-
-      // Если интро пропущено — запускаем молекулы на 200ms
-      setTimeout(() => {
-        spawnActive = true;
-        loopSpawn();
-      }, 200);
     }
 
     let mouseX = -9999;
