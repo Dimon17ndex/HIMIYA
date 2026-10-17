@@ -1402,6 +1402,7 @@
     // ============================================================
     const moleculesLayer = document.getElementById('mobileMolecules');
     let spawnActive = false;
+    const spawnStartTime = performance.now();   // 🆕 для «разгона» в начале
 
     if (moleculesLayer) {
       function createMoleculeSVG(scale) {
@@ -1494,16 +1495,22 @@
       function loopSpawn() {
         if (!spawnActive) return;
 
-        spawnMolecule();   // без бурста — каждая выплывает из-за края
+        spawnMolecule();
 
-        const nextDelay = 600 + Math.random() * 600;
+        // 🆕 В первые ~1.5s — спавним чаще (разгон), чтобы к приветствию уже летели несколько молекул.
+        // Дальше — стабильный темп.
+        const elapsed = performance.now() - spawnStartTime;
+        const nextDelay = elapsed < 1500
+          ? 200 + Math.random() * 200    // 0.2–0.4s (разгон)
+          : 600 + Math.random() * 600;   // 0.6–1.2s (стабильно)
+
         setTimeout(loopSpawn, nextDelay);
       }
     }
 
     // ============================================================
     // 🆕 Молекулы стартуют сразу после загрузки — во время лоадера,
-    // чтобы к моменту появления текста они уже плавно выплыли из-за экрана
+    // чтобы к моменту появления текста они уже плавно выплыли из-за экрана.
     // ============================================================
     spawnActive = true;
     if (typeof loopSpawn === 'function') loopSpawn();
