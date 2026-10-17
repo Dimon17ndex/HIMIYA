@@ -133,30 +133,18 @@
       linear-gradient(180deg, #0a0a0a 0%, #030303 100%);
   }
 
-  /* ===== 🧪 Плавающие молекулы — универсальный слой ===== */
-  .floating-molecules-layer {
+  /* ===== 🧪 Canvas с молекулами ===== */
+  .floating-molecules-canvas {
     position: fixed;
     inset: 0;
     z-index: 3;
     pointer-events: none;
-    overflow: hidden;
-    perspective: 800px;
-    perspective-origin: 50% 50%;
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 
-  .floating-molecule {
-    position: absolute;
-    left: 0;
-    top: 0;
-    will-change: transform, opacity, filter;
-    pointer-events: none;
-    opacity: 0;
-    transform-style: preserve-3d;
-    backface-visibility: visible;
-    -webkit-backface-visibility: visible;
-  }
-
-  /* ===== 🆕 ФОТО ПРЕПОДАВАТЕЛЯ НА ПК — ВНУТРИ СЦЕНЫ ===== */
+  /* ===== 🆕 ФОТО ПРЕПОДАВАТЕЛЯ НА ПК ===== */
   .desktop-teacher-photo {
     position: absolute;
     top: 84px;
@@ -497,7 +485,7 @@
     padding: 14px 18px;
   }
 
-  /* Фиолетовая кнопка "Открыть" — цвет #51166C */
+  /* Фиолетовая кнопка "Открыть" */
   .mobile-topic-open-btn {
     display: block;
     margin-left: auto;
@@ -1166,8 +1154,8 @@
 
   <div class="bg"></div>
 
-  <!-- 🧪 Универсальный слой с плавающими молекулами (ПК + мобилка) -->
-  <div class="floating-molecules-layer" id="floatingMolecules"></div>
+  <!-- 🧪 Canvas с плавающими молекулами (быстрее, чем SVG) -->
+  <canvas class="floating-molecules-canvas" id="floatingMoleculesCanvas"></canvas>
 
   <div class="loader" id="loader">
     <div class="spinner"></div>
@@ -1192,12 +1180,10 @@
       <div class="mobile-subtitle">наука о веществах и превращениях</div>
     </div>
 
-    <!-- Фото преподавателя (мобилка) -->
     <div class="mobile-teacher-photo">
       <img src="foto/anna_ermak.png" alt="ЕРМАК АННА НИКОЛАЕВНА">
     </div>
 
-    <!-- СЕКЦИЯ "ТЕМЫ" -->
     <div class="mobile-topics">
       <div class="mobile-topics-title">ТЕМЫ</div>
       <div class="mobile-topics-buttons">
@@ -1308,7 +1294,6 @@
 
   <div class="scene" id="scene">
 
-    <!-- Фото преподавателя на ПК — внутри сцены (получает параллакс и blur) -->
     <div class="desktop-teacher-photo">
       <img src="foto/anna_ermak.png" alt="ЕРМАК АННА НИКОЛАЕВНА">
     </div>
@@ -1449,11 +1434,32 @@
     const mobileContent        = document.getElementById('mobileContent');
     const infoPanel            = document.getElementById('infoPanel');
     const desktopTeacherPhoto  = document.querySelector('.desktop-teacher-photo');
-    const floatingMoleculesLayer = document.getElementById('floatingMolecules');
 
     // ============================================================
-    // 🧪 ПЛАВАЮЩИЕ МОЛЕКУЛЫ H₂O (ПК + мобилка)
+    // 🧪 ПЛАВАЮЩИЕ МОЛЕКУЛЫ H₂O на Canvas (ПК + мобилка)
     // ============================================================
+    const canvas = document.getElementById('floatingMoleculesCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+
+    function resizeCanvas() {
+      // retina
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvasWidth = window.innerWidth;
+      canvasHeight = window.innerHeight;
+      canvas.width = canvasWidth * dpr;
+      canvas.height = canvasHeight * dpr;
+      canvas.style.width = canvasWidth + 'px';
+      canvas.style.height = canvasHeight + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // ----- конфиг -----
     const moleculesConfig = {
       startBurst: isMobile ? 10 : 16,
       startProgressMax: 0.7,
@@ -1467,106 +1473,49 @@
       blurMax: isMobile ? 4 : 4.5
     };
 
+    // ----- состояние -----
+    const molecules = [];
     let spawnActive = false;
+    let isFirstSpawn = true;
+    let loopTimer = null;
 
-    function createMoleculeSVG(scale) {
-      const size = 80;
-      return `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${size * scale}" height="${size * scale}">
-          <line x1="50" y1="65" x2="28" y2="35"
-                stroke="#b8b8b8" stroke-width="6" stroke-linecap="round"/>
-          <line x1="50" y1="65" x2="72" y2="35"
-                stroke="#b8b8b8" stroke-width="6" stroke-linecap="round"/>
-          <circle cx="28" cy="35" r="9" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/>
-          <circle cx="72" cy="35" r="9" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/>
-          <circle cx="50" cy="65" r="14" fill="#ff4444"/>
-        </svg>
-      `;
+    // ----- фабрика молекулы -----
+    function createMolecule(initialProgress = 0) {
+      const c = moleculesConfig;
+
+      const scale    = c.scaleMin + Math.random() * (c.scaleMax - c.scaleMin);
+      const startX   = canvasWidth + 120;
+      const startY   = -120 - Math.random() * 100;
+      const endX     = -200 - Math.random() * 150;
+      const endY     = canvasHeight + 200 + Math.random() * 150;
+      const duration = c.durationMin + Math.random() * (c.durationMax - c.durationMin);
+      const blur     = c.blurMin + Math.random() * (c.blurMax - c.blurMin);
+      const rotation = (Math.random() - 0.5) * 40;
+      const opacityMax = 0.5 + Math.random() * 0.4;
+      const spinSpeed  = (Math.random() - 0.5) * 60;
+      const twistAxis  = Math.random() < 0.5 ? 'X' : 'Y';
+      const twistAngle = (40 + Math.random() * 120) * (Math.random() < 0.5 ? 1 : -1);
+      const twistAt    = 0.25 + Math.random() * 0.5;
+
+      return {
+        startX, startY, endX, endY,
+        duration, blur, rotation, opacityMax,
+        spinSpeed, twistAxis, twistAngle, twistAt,
+        scale,
+        startTime: performance.now() - initialProgress * duration
+      };
     }
 
     function spawnMolecule(initialProgress = 0) {
-      const c = moleculesConfig;
-
-      const scale       = c.scaleMin + Math.random() * (c.scaleMax - c.scaleMin);
-      const startX      = window.innerWidth  + 120;
-      const startY      = -120 - Math.random() * 100;
-      const endX        = -200 - Math.random() * 150;
-      const endY        = window.innerHeight + 200 + Math.random() * 150;
-      const duration    = c.durationMin + Math.random() * (c.durationMax - c.durationMin);
-      const blur        = c.blurMin + Math.random() * (c.blurMax - c.blurMin);
-      const rotation    = (Math.random() - 0.5) * 40;
-      const opacityMax  = 0.5 + Math.random() * 0.4;
-      const spinSpeed   = (Math.random() - 0.5) * 60;
-      const twistAxis   = Math.random() < 0.5 ? 'X' : 'Y';
-      const twistAngle  = (40 + Math.random() * 120) * (Math.random() < 0.5 ? 1 : -1);
-      const twistAt     = 0.25 + Math.random() * 0.5;
-
-      const el = document.createElement('div');
-      el.className = 'floating-molecule';
-      el.style.left = '0';
-      el.style.top = '0';
-      el.innerHTML = createMoleculeSVG(scale);
-      floatingMoleculesLayer.appendChild(el);
-
-      el.style.transform = `translate(${startX}px, ${startY}px) rotate(${rotation}deg)`;
-      el.style.filter = `blur(${blur}px)`;
-
-      const startTime = performance.now() - initialProgress * duration;
-
-      function step(now) {
-        const rawT = Math.min(1, (now - startTime) / duration);
-        const eased = rawT * rawT * (3 - 2 * rawT);
-
-        const cx = startX + (endX - startX) * eased;
-        const cy = startY + (endY - startY) * eased;
-
-        const sway = Math.sin(rawT * Math.PI * 6) * 20;
-
-        let twist = 0;
-        const twistRange = 0.12;
-        if (rawT > twistAt - twistRange && rawT < twistAt + twistRange) {
-          const localT = (rawT - (twistAt - twistRange)) / (twistRange * 2);
-          twist = Math.sin(localT * Math.PI) * twistAngle;
-        }
-
-        let alpha;
-        if (rawT < 0.1) alpha = rawT / 0.1;
-        else if (rawT > 0.85) alpha = (1 - rawT) / 0.15;
-        else alpha = 1;
-        alpha *= opacityMax;
-
-        const twistTransform =
-          twistAxis === 'X'
-            ? `rotateX(${twist}deg)`
-            : `rotateY(${twist}deg)`;
-
-        const currentRotation = rotation + sway * 0.3 + spinSpeed * (rawT * duration / 1000);
-
-        el.style.transform =
-          `translate(${cx + sway}px, ${cy}px) ` +
-          `rotate(${currentRotation}deg) ` +
-          `${twistTransform}`;
-        el.style.opacity = alpha;
-
-        if (rawT < 1) {
-          requestAnimationFrame(step);
-        } else {
-          el.remove();
-        }
-      }
-
-      requestAnimationFrame(step);
+      molecules.push(createMolecule(initialProgress));
     }
-
-    let isFirstSpawn = true;
 
     function loopSpawn() {
       if (!spawnActive) return;
 
       if (isFirstSpawn) {
         for (let i = 0; i < moleculesConfig.startBurst; i++) {
-          const progress = Math.random() * moleculesConfig.startProgressMax;
-          spawnMolecule(progress);
+          spawnMolecule(Math.random() * moleculesConfig.startProgressMax);
         }
         isFirstSpawn = false;
       } else {
@@ -1574,10 +1523,126 @@
       }
 
       const nextDelay = moleculesConfig.spawnMin + Math.random() * (moleculesConfig.spawnMax - moleculesConfig.spawnMin);
-      setTimeout(() => {
-        if (spawnActive) loopSpawn();
-      }, nextDelay);
+      loopTimer = setTimeout(loopSpawn, nextDelay);
     }
+
+    // ----- рисование одной молекулы -----
+    function drawMolecule(m, now) {
+      const rawT = Math.min(1, (now - m.startTime) / m.duration);
+      const eased = rawT * rawT * (3 - 2 * rawT);
+
+      const cx = m.startX + (m.endX - m.startX) * eased;
+      const cy = m.startY + (m.endY - m.startY) * eased;
+
+      const sway = Math.sin(rawT * Math.PI * 6) * 20;
+
+      // culling — если далеко за экраном, не рисуем
+      if (cx < -400 || cx > canvasWidth + 400 || cy < -400 || cy > canvasHeight + 400) {
+        return false;
+      }
+
+      let twist = 0;
+      const twistRange = 0.12;
+      if (rawT > m.twistAt - twistRange && rawT < m.twistAt + twistRange) {
+        const localT = (rawT - (m.twistAt - twistRange)) / (twistRange * 2);
+        twist = Math.sin(localT * Math.PI) * m.twistAngle;
+      }
+
+      let alpha;
+      if (rawT < 0.1) alpha = rawT / 0.1;
+      else if (rawT > 0.85) alpha = (1 - rawT) / 0.15;
+      else alpha = 1;
+      alpha *= m.opacityMax;
+
+      if (alpha <= 0.01) return rawT < 1;
+
+      const currentRotation = m.rotation + sway * 0.3 + m.spinSpeed * (rawT * m.duration / 1000);
+
+      // сохраняем контекст
+      ctx.save();
+
+      // перенос в позицию
+      ctx.translate(cx + sway, cy);
+
+      // имитация 3D-поворота через масштаб по оси
+      const twistRad = (twist * Math.PI) / 180;
+      let scaleX = 1, scaleY = 1;
+      if (m.twistAxis === 'X') {
+        scaleY = Math.cos(twistRad);
+      } else {
+        scaleX = Math.cos(twistRad);
+      }
+
+      ctx.rotate((currentRotation * Math.PI) / 180);
+      ctx.scale(m.scale * scaleX, m.scale * scaleY);
+
+      ctx.globalAlpha = alpha;
+
+      // 🆕 blur через filter (Canvas 2D поддерживает)
+      ctx.filter = `blur(${m.blur}px)`;
+
+      // рисуем молекулу H₂O — размеры в локальных координатах
+      // кислород (внизу) — центр (0, 15), радиус 14
+      // два водорода: (-22, -15) и (22, -15), радиус 9
+      // связи: от кислорода к водородам
+
+      // связи
+      ctx.strokeStyle = '#b8b8b8';
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(0, 15);
+      ctx.lineTo(-22, -15);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, 15);
+      ctx.lineTo(22, -15);
+      ctx.stroke();
+
+      // водороды (белые)
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-22, -15, 9, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(22, -15, 9, 0, Math.PI * 2);
+      ctx.fill();
+
+      // кислород (красный)
+      ctx.fillStyle = '#ff4444';
+      ctx.beginPath();
+      ctx.arc(0, 15, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      return rawT < 1;
+    }
+
+    // ----- главный цикл -----
+    function renderLoop() {
+      const now = performance.now();
+
+      // очищаем холст
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+      // рисуем и фильтруем "живые" молекулы
+      for (let i = molecules.length - 1; i >= 0; i--) {
+        const alive = drawMolecule(molecules[i], now);
+        if (!alive) {
+          molecules.splice(i, 1);
+        }
+      }
+
+      requestAnimationFrame(renderLoop);
+    }
+
+    // если спавн активен но молекул нет — и ничего не бежит — не крутим бесконечно
+    // (но requestAnimationFrame всё равно нужен, потому что молекулы могут ещё лететь)
+    renderLoop();
 
     // ============================================================
     // 🎬 АНИМАЦИЯ ПОЯВЛЕНИЯ
@@ -1618,7 +1683,7 @@
       }, 4000);
 
     } else {
-      // 🚫 При перезагрузке — БЕЗ молекул, БЕЗ интро, сразу финальный экран
+      // При перезагрузке — без молекул, без интро, сразу финальный экран
       document.body.classList.add('skip-intro');
       setTimeout(() => {
         topbar.classList.add('show');
@@ -1631,6 +1696,9 @@
       }, 100);
     }
 
+    // ============================================================
+    // 🖱 ХОВЕРЫ, ПАРАЛЛАКС, КЛИКИ (как было)
+    // ============================================================
     let mouseX = -9999;
     let mouseY = -9999;
 
@@ -1776,9 +1844,6 @@
       });
     }
 
-    // ============================================================
-    // 📜 SCROLL-AWARE LOGO (только для мобилки)
-    // ============================================================
     if (isMobile) {
       const topbarBrand = document.querySelector('.topbar .brand');
       const mobileTitle = document.querySelector('.mobile-title');
@@ -1800,9 +1865,6 @@
       }
     }
 
-    // ============================================================
-    // 📚 РАСКРЫТИЕ ТЕМ (только для мобилки)
-    // ============================================================
     if (isMobile) {
       document.querySelectorAll('.mobile-topic-item').forEach(item => {
         const btn = item.querySelector('.mobile-topic-btn');
