@@ -141,7 +141,7 @@
     pointer-events: none;
     overflow: hidden;
     display: none;
-    perspective: 800px;      /* 🆕 перспектива для 3D-закручивания */
+    perspective: 800px;
     perspective-origin: 50% 50%;
   }
 
@@ -156,7 +156,7 @@
     will-change: transform, opacity, filter;
     pointer-events: none;
     opacity: 0;
-    transform-style: preserve-3d;   /* 🆕 чтобы rotate3d работал корректно */
+    transform-style: preserve-3d;
     backface-visibility: visible;
     -webkit-backface-visibility: visible;
   }
@@ -1708,29 +1708,17 @@
           const endX        = -200 - Math.random() * 150;
           const endY        = window.innerHeight + 200 + Math.random() * 150;
           const duration    = 8000 + Math.random() * 8000;
-
-          // 🆕 Все молекулы с blur
-          const blur = 1.5 + Math.random() * 2.5;   // 1.5–4px
-
+          const blur        = 1.5 + Math.random() * 2.5;
           const rotation    = (Math.random() - 0.5) * 40;
           const opacityMax  = 0.5 + Math.random() * 0.4;
 
-          // 🆕 "Закручивание как лист" — выбираем ось (X или Y) и случайный угол
+          // 🆕 Скорость 2D-вращения в градусах в секунду
+          const spinSpeed   = (Math.random() - 0.5) * 60;   // -30°…+30°/с
+
+          // 🆕 3D-закручивание как лист
           const twistAxis   = Math.random() < 0.5 ? 'X' : 'Y';
           const twistAngle  = (40 + Math.random() * 120) * (Math.random() < 0.5 ? 1 : -1);
-          // Время, когда случится "закручивание" (доля от 0 до 1)
-          const twistAt     = 0.25 + Math.random() * 0.5;   // 25% – 75% пути
-
-          // 🆕 Скорость меняется — несколько фаз с разными скоростями
-          //   сделаем 2–3 "ускорения/замедления" на пути
-          const speedProfile = [];
-          const phasesCount = 2 + Math.floor(Math.random() * 2); // 2 или 3
-          for (let i = 0; i < phasesCount; i++) {
-            speedProfile.push({
-              // в каждой фазе скорость от 0.4 до 1.6 (замедление/ускорение)
-              factor: 0.4 + Math.random() * 1.2
-            });
-          }
+          const twistAt     = 0.25 + Math.random() * 0.5;
 
           const el = document.createElement('div');
           el.className = 'floating-molecule';
@@ -1748,29 +1736,6 @@
             if (!startTime) startTime = now;
 
             const rawT = Math.min(1, (now - startTime) / duration);
-
-            // 🆕 Функция "неравномерной" скорости: нарезаем на фазы
-            //    внутри каждой фазы — ease, а между фазами — плавный переход
-            let t = 0;
-            let remaining = rawT;
-            const phaseLen = 1 / phasesCount;
-
-            for (let i = 0; i < phasesCount; i++) {
-              if (remaining <= 0) break;
-              const inPhase = Math.min(remaining / phaseLen, 1);
-              const eased = inPhase * inPhase * (3 - 2 * inPhase); // smoothstep внутри фазы
-              const contribution = eased * phaseLen * speedProfile[i].factor;
-              t += contribution;
-              remaining -= inPhase * phaseLen;
-            }
-
-            // Нормализуем, чтобы t вёл к 1
-            const totalFactor = speedProfile.reduce((s, p) => s + p.factor, 0);
-            t = t / totalFactorsSafe(totalFactor) * phasesCount / 1; // приблизительно
-            // Проще: пересчитаем через кумулятивную позицию
-            // (см. ниже — упрощённая версия)
-
-            // Применяем ease на всём диапазоне
             const eased = rawT * rawT * (3 - 2 * rawT);
 
             const cx = startX + (endX - startX) * eased;
@@ -1778,13 +1743,11 @@
 
             const sway = Math.sin(rawT * Math.PI * 6) * 20;
 
-            // 🆕 Резкое закручивание как лист
-            //    Пиковое значение достигается в twistAt
+            // 3D-закручивание как лист
             let twist = 0;
-            const twistRange = 0.12; // 12% пути — длительность закручивания
+            const twistRange = 0.12;
             if (rawT > twistAt - twistRange && rawT < twistAt + twistRange) {
-              const localT = (rawT - (twistAt - twistRange)) / (twistRange * 2); // 0..1
-              // Резкий пик: sin(π * localT)
+              const localT = (rawT - (twistAt - twistRange)) / (twistRange * 2);
               twist = Math.sin(localT * Math.PI) * twistAngle;
             }
 
@@ -1794,16 +1757,17 @@
             else alpha = 1;
             alpha *= opacityMax;
 
-            // 🆕 3D-поворот: rotateX/Y для листа
-            //    Обычный rotate — для базового наклона
             const twistTransform =
               twistAxis === 'X'
                 ? `rotateX(${twist}deg)`
                 : `rotateY(${twist}deg)`;
 
+            // 🆕 Обычный 2D-поворот: базовый угол + постепенное вращение
+            const currentRotation = rotation + sway * 0.3 + spinSpeed * (rawT * duration / 1000);
+
             el.style.transform =
               `translate(${cx + sway}px, ${cy}px) ` +
-              `rotate(${rotation + sway * 0.3}deg) ` +
+              `rotate(${currentRotation}deg) ` +
               `${twistTransform}`;
             el.style.opacity = alpha;
 
@@ -1812,11 +1776,6 @@
             } else {
               el.remove();
             }
-          }
-
-          // Хелпер — чтобы не падало деление на 0
-          function totalFactorsSafe(total) {
-            return total > 0 ? total : 1;
           }
 
           requestAnimationFrame(step);
