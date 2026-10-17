@@ -43,7 +43,6 @@
     opacity: 0;
   }
 
-  /* ===== 🔄 Лоадер ===== */
   .loader {
     position: fixed;
     inset: 0;
@@ -67,7 +66,6 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ===== 🎬 Тексты ===== */
   .intro-text {
     position: fixed;
     inset: 0;
@@ -122,7 +120,6 @@
     display: none;
   }
 
-  /* ===== Фон ===== */
   .bg {
     position: fixed;
     inset: 0;
@@ -133,7 +130,6 @@
       linear-gradient(180deg, #0a0a0a 0%, #030303 100%);
   }
 
-  /* ===== 🧪 Плавающие молекулы (ПК + мобилка) ===== */
   .mobile-molecules {
     position: fixed;
     inset: 0;
@@ -157,7 +153,6 @@
     -webkit-backface-visibility: visible;
   }
 
-  /* ===== 🆕 ФОТО ПРЕПОДАВАТЕЛЯ НА ПК — ВНУТРИ СЦЕНЫ ===== */
   .desktop-teacher-photo {
     position: absolute;
     top: 84px;
@@ -186,7 +181,6 @@
     display: none !important;
   }
 
-  /* ===== 🎬 Сцена (ПК) ===== */
   .scene {
     position: fixed;
     inset: 0;
@@ -214,7 +208,6 @@
     pointer-events: none !important;
   }
 
-  /* ===== 📱 Мобильный контент ===== */
   .mobile-content {
     position: relative;
     z-index: 8;
@@ -236,7 +229,6 @@
     opacity: 1;
   }
 
-  /* ===== 📱 Заголовок ХИМИЯ ===== */
   .mobile-header {
     margin-bottom: 40px;
     opacity: 0;
@@ -273,7 +265,6 @@
     margin: 0 auto;
   }
 
-  /* ===== 📱 ФОТО ПРЕПОДАВАТЕЛЯ НА МОБИЛКЕ ===== */
   .mobile-teacher-photo {
     width: 100%;
     max-width: calc(100vw - 48px);
@@ -293,7 +284,6 @@
     display: block;
   }
 
-  /* (стили .mobile-buttons и .mobile-btn оставлены — не используются) */
   .mobile-buttons {
     display: flex;
     flex-direction: column;
@@ -338,7 +328,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
-  /* (стили .mobile-method оставлены — не используются) */
   .mobile-method {
     width: 100%;
     max-width: calc(100vw - 48px);
@@ -360,7 +349,6 @@
     animation: mobileHeaderAppear 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.72s forwards;
   }
 
-  /* ===== 📚 СЕКЦИЯ "ТЕМЫ" ===== */
   .mobile-topics {
     width: 100%;
     max-width: calc(100vw - 48px);
@@ -498,7 +486,6 @@
     padding: 14px 18px;
   }
 
-  /* Фиолетовая кнопка "Открыть" — цвет #51166C */
   .mobile-topic-open-btn {
     display: block;
     margin-left: auto;
@@ -528,7 +515,6 @@
     box-shadow: 0 4px 12px rgba(81, 22, 108, 0.45);
   }
 
-  /* ===== 🪑 Стол ===== */
   .table {
     position: absolute;
     top: 72%;
@@ -592,7 +578,6 @@
     z-index: -1;
   }
 
-  /* ===== 🧪 Колбочки ===== */
   .flask {
     position: absolute;
     top: 0%;
@@ -623,20 +608,8 @@
     width: 48px;
     height: 72px;
     overflow: hidden;
-
-    clip-path: polygon(
-      44% 0%,
-      56% 0%,
-      56% 12%,
-      100% 100%,
-      0% 100%,
-      44% 12%
-    );
-
-    background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.18) 100%);
-
+    clip-path: polygon(44% 0%, 56% 0%, 56% 12%, 100% 100%, 0% 100%, 44% 12%);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.18) 100%);
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.2));
   }
 
@@ -644,14 +617,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    clip-path: polygon(
-      44% 0%,
-      56% 0%,
-      56% 12%,
-      100% 100%,
-      0% 100%,
-      44% 12%
-    );
+    clip-path: polygon(44% 0%, 56% 0%, 56% 12%, 100% 100%, 0% 100%, 44% 12%);
     box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.85);
     pointer-events: none;
     z-index: 6;
@@ -666,14 +632,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    clip-path: polygon(
-      44% 0%,
-      56% 0%,
-      56% 12%,
-      100% 100%,
-      0% 100%,
-      44% 12%
-    );
+    clip-path: polygon(44% 0%, 56% 0%, 56% 12%, 100% 100%, 0% 100%, 44% 12%);
     background: transparent;
     pointer-events: none;
     z-index: 5;
@@ -796,7 +755,6 @@
       transparent 60%, #f472b6 61%, #f472b6 100%);
   }
 
-  /* ===== 💻 Ноутбук ===== */
   .laptop-wrap {
     position: absolute;
     top: 0%;
@@ -915,7 +873,6 @@
     border-radius: 2px;
   }
 
-  /* ===== 🎯 Меню кнопок ===== */
   .laptop-menu {
     position: absolute;
     bottom: calc(100% + 16px);
@@ -1004,7 +961,6 @@
     to   { opacity: 1; transform: scale(1); }
   }
 
-  /* ===== 🔝 Вкладка ===== */
   .topbar {
     position: fixed;
     top: 0;
@@ -1086,9 +1042,6 @@
     transform: none !important;
   }
 
-  /* ============================================================
-     📋 ПЛАШКА "О ПРОЕКТЕ" — БЫСТРАЯ
-     ============================================================ */
   .info-panel {
     position: fixed;
     top: 68px;
@@ -1167,7 +1120,6 @@
 
   <div class="bg"></div>
 
-  <!-- 🧪 Слой с плавающими молекулами (ПК + мобилка) -->
   <div class="mobile-molecules" id="mobileMolecules"></div>
 
   <div class="loader" id="loader">
@@ -1193,12 +1145,10 @@
       <div class="mobile-subtitle">наука о веществах и превращениях</div>
     </div>
 
-    <!-- Фото преподавателя (мобилка) -->
     <div class="mobile-teacher-photo">
       <img src="foto/anna_ermak.png" alt="ЕРМАК АННА НИКОЛАЕВНА">
     </div>
 
-    <!-- СЕКЦИЯ "ТЕМЫ" -->
     <div class="mobile-topics">
       <div class="mobile-topics-title">ТЕМЫ</div>
       <div class="mobile-topics-buttons">
@@ -1309,7 +1259,6 @@
 
   <div class="scene" id="scene">
 
-    <!-- Фото преподавателя на ПК — внутри сцены (получает параллакс и blur) -->
     <div class="desktop-teacher-photo">
       <img src="foto/anna_ermak.png" alt="ЕРМАК АННА НИКОЛАЕВНА">
     </div>
@@ -1416,9 +1365,6 @@
 
   <script>
     
-    // ============================================================
-    // 🌐 SERVICE WORKER — офлайн-режим
-    // ============================================================
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
@@ -1545,25 +1491,22 @@
         requestAnimationFrame(step);
       }
 
-      let isFirstSpawn = true;
-
       function loopSpawn() {
         if (!spawnActive) return;
 
-        if (isFirstSpawn) {
-          for (let i = 0; i < 10; i++) {
-            const progress = Math.random() * 0.7;
-            spawnMolecule(progress);
-          }
-          isFirstSpawn = false;
-        } else {
-          spawnMolecule();
-        }
+        spawnMolecule();   // без бурста — каждая выплывает из-за края
 
-        const nextDelay = 800 + Math.random() * 800;
+        const nextDelay = 600 + Math.random() * 600;
         setTimeout(loopSpawn, nextDelay);
       }
     }
+
+    // ============================================================
+    // 🆕 Молекулы стартуют сразу после загрузки — во время лоадера,
+    // чтобы к моменту появления текста они уже плавно выплыли из-за экрана
+    // ============================================================
+    spawnActive = true;
+    if (typeof loopSpawn === 'function') loopSpawn();
 
     // ============================================================
     // 🎬 АНИМАЦИЯ ПОЯВЛЕНИЯ
@@ -1577,8 +1520,6 @@
 
       setTimeout(() => {
         text1.classList.add('show');
-        spawnActive = true;
-        if (typeof loopSpawn === 'function') loopSpawn();
       }, 1450);
 
       setTimeout(() => {
@@ -1596,9 +1537,9 @@
         topbar.classList.add('show');
         if (isMobile) {
           mobileContent.classList.add('show');
-          // 🆕 на мобилке молекулы продолжают спавниться — spawnActive НЕ трогаем
+          // на мобилке молекулы продолжают спавниться
         } else {
-          spawnActive = false;   // 🆕 только на ПК прекращаем спавн
+          spawnActive = false;   // только ПК: прекращаем спавн
           table.classList.add('show');
           if (desktopTeacherPhoto) desktopTeacherPhoto.classList.add('show');
         }
@@ -1606,6 +1547,7 @@
 
     } else {
       document.body.classList.add('skip-intro');
+
       setTimeout(() => {
         topbar.classList.add('show');
         if (isMobile) {
@@ -1762,9 +1704,6 @@
       });
     }
 
-    // ============================================================
-    // 📜 SCROLL-AWARE LOGO (только для мобилки)
-    // ============================================================
     if (isMobile) {
       const topbarBrand = document.querySelector('.topbar .brand');
       const mobileTitle = document.querySelector('.mobile-title');
@@ -1786,9 +1725,6 @@
       }
     }
 
-    // ============================================================
-    // 📚 РАСКРЫТИЕ ТЕМ (только для мобилки)
-    // ============================================================
     if (isMobile) {
       document.querySelectorAll('.mobile-topic-item').forEach(item => {
         const btn = item.querySelector('.mobile-topic-btn');
@@ -1801,9 +1737,6 @@
       });
     }
 
-    // ============================================================
-    // 📋 ПЛАШКА "О ПРОЕКТЕ"
-    // ============================================================
     let infoPanelOpen = false;
 
     function openMenu() {
