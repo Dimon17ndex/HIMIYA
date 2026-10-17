@@ -1402,7 +1402,7 @@
     // ============================================================
     const moleculesLayer = document.getElementById('mobileMolecules');
     let spawnActive = false;
-    const spawnStartTime = performance.now();   // 🆕 для «разгона» в начале
+    const spawnStartTime = performance.now();
 
     if (moleculesLayer) {
       function createMoleculeSVG(scale) {
@@ -1497,29 +1497,29 @@
 
         spawnMolecule();
 
-        // 🆕 В первые ~1.5s — спавним чаще (разгон), чтобы к приветствию уже летели несколько молекул.
-        // Дальше — стабильный темп.
         const elapsed = performance.now() - spawnStartTime;
         const nextDelay = elapsed < 1500
-          ? 200 + Math.random() * 200    // 0.2–0.4s (разгон)
-          : 600 + Math.random() * 600;   // 0.6–1.2s (стабильно)
+          ? 200 + Math.random() * 200
+          : 600 + Math.random() * 600;
 
         setTimeout(loopSpawn, nextDelay);
       }
     }
 
     // ============================================================
-    // 🆕 Молекулы стартуют сразу после загрузки — во время лоадера,
-    // чтобы к моменту появления текста они уже плавно выплыли из-за экрана.
+    // 🧪 Старт молекул — только первый заход ИЛИ мобилка.
+    // На ПК при перезагрузке молекулы не спавнятся.
     // ============================================================
-    spawnActive = true;
-    if (typeof loopSpawn === 'function') loopSpawn();
+    const isFirstVisit = !sessionStorage.getItem('visited');
+
+    if (isFirstVisit || isMobile) {
+      spawnActive = true;
+      if (typeof loopSpawn === 'function') loopSpawn();
+    }
 
     // ============================================================
     // 🎬 АНИМАЦИЯ ПОЯВЛЕНИЯ
     // ============================================================
-    const isFirstVisit = !sessionStorage.getItem('visited');
-
     if (isFirstVisit) {
       sessionStorage.setItem('visited', 'true');
 
