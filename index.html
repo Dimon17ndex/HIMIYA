@@ -1456,7 +1456,7 @@
     const desktopTeacherPhoto  = document.querySelector('.desktop-teacher-photo');
 
     // ============================================================
-    // 🧪 ПЛАВАЮЩИЕ МОЛЕКУЛЫ H₂O — инициализируем и запускаем сразу
+    // 🧪 ПЛАВАЮЩИЕ МОЛЕКУЛЫ H₂O — стартовый бурст + плавный спавн
     // ============================================================
     if (isMobile) {
       const moleculesLayer = document.getElementById('mobileMolecules');
@@ -1477,7 +1477,8 @@
           `;
         }
 
-        function spawnMolecule() {
+        // 🆕 initialProgress — с какого места пути молекула начинает (0..1)
+        function spawnMolecule(initialProgress = 0) {
           const scale       = 0.5 + Math.random() * 1.2;
           const startX      = window.innerWidth  + 120;
           const startY      = -120 - Math.random() * 100;
@@ -1502,11 +1503,11 @@
           el.style.transform = `translate(${startX}px, ${startY}px) rotate(${rotation}deg)`;
           el.style.filter = `blur(${blur}px)`;
 
-          let startTime = null;
+          // 🆕 сдвиг стартового времени на initialProgress * duration,
+          //    чтобы часть молекул "уже летела"
+          const startTime = performance.now() - initialProgress * duration;
 
           function step(now) {
-            if (!startTime) startTime = now;
-
             const rawT = Math.min(1, (now - startTime) / duration);
             const eased = rawT * rawT * (3 - 2 * rawT);
 
@@ -1551,13 +1552,25 @@
           requestAnimationFrame(step);
         }
 
+        // 🆕 Стартовый бурст + плавный спавн
+        let isFirstSpawn = true;
+
         function loopSpawn() {
-          spawnMolecule();
-          const nextDelay = 600 + Math.random() * 1400;
+          if (isFirstSpawn) {
+            // Стартовый бурст — сразу 10 молекул, распределённых по пути
+            for (let i = 0; i < 10; i++) {
+              const progress = Math.random() * 0.7;
+              spawnMolecule(progress);
+            }
+            isFirstSpawn = false;
+          } else {
+            spawnMolecule();
+          }
+
+          const nextDelay = 800 + Math.random() * 800;   // 0.8–1.6s
           setTimeout(loopSpawn, nextDelay);
         }
 
-        // 🆕 Запускаем сразу — молекулы летят уже во время лоадера
         loopSpawn();
       }
     }
