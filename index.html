@@ -140,7 +140,7 @@
     z-index: 2;
     pointer-events: none;
     overflow: hidden;
-    display: block;             /* видимо везде */
+    display: block;
     perspective: 800px;
     perspective-origin: 50% 50%;
   }
@@ -1594,10 +1594,11 @@
 
       setTimeout(() => {
         topbar.classList.add('show');
-        spawnActive = false;
         if (isMobile) {
           mobileContent.classList.add('show');
+          // 🆕 на мобилке молекулы продолжают спавниться — spawnActive НЕ трогаем
         } else {
+          spawnActive = false;   // 🆕 только на ПК прекращаем спавн
           table.classList.add('show');
           if (desktopTeacherPhoto) desktopTeacherPhoto.classList.add('show');
         }
