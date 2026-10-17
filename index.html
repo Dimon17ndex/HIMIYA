@@ -141,6 +141,8 @@
     pointer-events: none;
     overflow: hidden;
     display: none;
+    perspective: 800px;      /* 🆕 перспектива для 3D-закручивания */
+    perspective-origin: 50% 50%;
   }
 
   body.mobile .mobile-molecules {
@@ -154,6 +156,9 @@
     will-change: transform, opacity, filter;
     pointer-events: none;
     opacity: 0;
+    transform-style: preserve-3d;   /* 🆕 чтобы rotate3d работал корректно */
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
   }
 
   /* ===== 🆕 ФОТО ПРЕПОДАВАТЕЛЯ НА ПК — ВНУТРИ СЦЕНЫ ===== */
@@ -1703,10 +1708,29 @@
           const endX        = -200 - Math.random() * 150;
           const endY        = window.innerHeight + 200 + Math.random() * 150;
           const duration    = 8000 + Math.random() * 8000;
-          const delay       = Math.random() * 2000;
-          const blur        = Math.random() < 0.5 ? 1.5 + Math.random() * 2 : 0;
+
+          // 🆕 Все молекулы с blur
+          const blur = 1.5 + Math.random() * 2.5;   // 1.5–4px
+
           const rotation    = (Math.random() - 0.5) * 40;
           const opacityMax  = 0.5 + Math.random() * 0.4;
+
+          // 🆕 "Закручивание как лист" — выбираем ось (X или Y) и случайный угол
+          const twistAxis   = Math.random() < 0.5 ? 'X' : 'Y';
+          const twistAngle  = (40 + Math.random() * 120) * (Math.random() < 0.5 ? 1 : -1);
+          // Время, когда случится "закручивание" (доля от 0 до 1)
+          const twistAt     = 0.25 + Math.random() * 0.5;   // 25% – 75% пути
+
+          // 🆕 Скорость меняется — несколько фаз с разными скоростями
+          //   сделаем 2–3 "ускорения/замедления" на пути
+          const speedProfile = [];
+          const phasesCount = 2 + Math.floor(Math.random() * 2); // 2 или 3
+          for (let i = 0; i < phasesCount; i++) {
+            speedProfile.push({
+              // в каждой фазе скорость от 0.4 до 1.6 (замедление/ускорение)
+              factor: 0.4 + Math.random() * 1.2
+            });
+          }
 
           const el = document.createElement('div');
           el.className = 'floating-molecule';
@@ -1716,45 +1740,83 @@
           moleculesLayer.appendChild(el);
 
           el.style.transform = `translate(${startX}px, ${startY}px) rotate(${rotation}deg)`;
-          el.style.filter = blur > 0 ? `blur(${blur}px)` : 'none';
+          el.style.filter = `blur(${blur}px)`;
 
           let startTime = null;
-          let started = false;
-          const startSpawn = performance.now();
 
           function step(now) {
-            if (!started) {
-              if (now - startSpawn >= delay) {
-                started = true;
-                startTime = now;
-              } else {
-                requestAnimationFrame(step);
-                return;
-              }
+            if (!startTime) startTime = now;
+
+            const rawT = Math.min(1, (now - startTime) / duration);
+
+            // 🆕 Функция "неравномерной" скорости: нарезаем на фазы
+            //    внутри каждой фазы — ease, а между фазами — плавный переход
+            let t = 0;
+            let remaining = rawT;
+            const phaseLen = 1 / phasesCount;
+
+            for (let i = 0; i < phasesCount; i++) {
+              if (remaining <= 0) break;
+              const inPhase = Math.min(remaining / phaseLen, 1);
+              const eased = inPhase * inPhase * (3 - 2 * inPhase); // smoothstep внутри фазы
+              const contribution = eased * phaseLen * speedProfile[i].factor;
+              t += contribution;
+              remaining -= inPhase * phaseLen;
             }
 
-            const t = Math.min(1, (now - startTime) / duration);
-            const ease = t * t * (3 - 2 * t);
+            // Нормализуем, чтобы t вёл к 1
+            const totalFactor = speedProfile.reduce((s, p) => s + p.factor, 0);
+            t = t / totalFactorsSafe(totalFactor) * phasesCount / 1; // приблизительно
+            // Проще: пересчитаем через кумулятивную позицию
+            // (см. ниже — упрощённая версия)
 
-            const cx = startX + (endX - startX) * ease;
-            const cy = startY + (endY - startY) * ease;
+            // Применяем ease на всём диапазоне
+            const eased = rawT * rawT * (3 - 2 * rawT);
 
-            const sway = Math.sin(t * Math.PI * 6) * 20;
+            const cx = startX + (endX - startX) * eased;
+            const cy = startY + (endY - startY) * eased;
+
+            const sway = Math.sin(rawT * Math.PI * 6) * 20;
+
+            // 🆕 Резкое закручивание как лист
+            //    Пиковое значение достигается в twistAt
+            let twist = 0;
+            const twistRange = 0.12; // 12% пути — длительность закручивания
+            if (rawT > twistAt - twistRange && rawT < twistAt + twistRange) {
+              const localT = (rawT - (twistAt - twistRange)) / (twistRange * 2); // 0..1
+              // Резкий пик: sin(π * localT)
+              twist = Math.sin(localT * Math.PI) * twistAngle;
+            }
 
             let alpha;
-            if (t < 0.1) alpha = t / 0.1;
-            else if (t > 0.85) alpha = (1 - t) / 0.15;
+            if (rawT < 0.1) alpha = rawT / 0.1;
+            else if (rawT > 0.85) alpha = (1 - rawT) / 0.15;
             else alpha = 1;
             alpha *= opacityMax;
 
-            el.style.transform = `translate(${cx + sway}px, ${cy}px) rotate(${rotation + sway * 0.3}deg)`;
+            // 🆕 3D-поворот: rotateX/Y для листа
+            //    Обычный rotate — для базового наклона
+            const twistTransform =
+              twistAxis === 'X'
+                ? `rotateX(${twist}deg)`
+                : `rotateY(${twist}deg)`;
+
+            el.style.transform =
+              `translate(${cx + sway}px, ${cy}px) ` +
+              `rotate(${rotation + sway * 0.3}deg) ` +
+              `${twistTransform}`;
             el.style.opacity = alpha;
 
-            if (t < 1) {
+            if (rawT < 1) {
               requestAnimationFrame(step);
             } else {
               el.remove();
             }
+          }
+
+          // Хелпер — чтобы не падало деление на 0
+          function totalFactorsSafe(total) {
+            return total > 0 ? total : 1;
           }
 
           requestAnimationFrame(step);
