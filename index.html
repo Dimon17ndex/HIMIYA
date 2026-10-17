@@ -133,20 +133,15 @@
       linear-gradient(180deg, #0a0a0a 0%, #030303 100%);
   }
 
-  /* ===== 🧪 Плавающие молекулы (только мобилка) ===== */
-  .mobile-molecules {
+  /* ===== 🧪 Плавающие молекулы — универсальный слой ===== */
+  .floating-molecules-layer {
     position: fixed;
     inset: 0;
-    z-index: 2;
+    z-index: 3;                   /* над фоном, под сценой (5) и под контентом (8) */
     pointer-events: none;
     overflow: hidden;
-    display: none;
     perspective: 800px;
     perspective-origin: 50% 50%;
-  }
-
-  body.mobile .mobile-molecules {
-    display: block;
   }
 
   .floating-molecule {
@@ -1171,8 +1166,8 @@
 
   <div class="bg"></div>
 
-  <!-- 🧪 Слой с плавающими молекулами (мобилка) -->
-  <div class="mobile-molecules" id="mobileMolecules"></div>
+  <!-- 🧪 Универсальный слой с плавающими молекулами (ПК + мобилка) -->
+  <div class="floating-molecules-layer" id="floatingMolecules"></div>
 
   <div class="loader" id="loader">
     <div class="spinner"></div>
@@ -1454,125 +1449,134 @@
     const mobileContent        = document.getElementById('mobileContent');
     const infoPanel            = document.getElementById('infoPanel');
     const desktopTeacherPhoto  = document.querySelector('.desktop-teacher-photo');
+    const floatingMoleculesLayer = document.getElementById('floatingMolecules');
 
     // ============================================================
-    // 🧪 ПЛАВАЮЩИЕ МОЛЕКУЛЫ H₂O — стартовый бурст + плавный спавн
+    // 🧪 ПЛАВАЮЩИЕ МОЛЕКУЛЫ H₂O (ПК + мобилка)
     // ============================================================
-    if (isMobile) {
-      const moleculesLayer = document.getElementById('mobileMolecules');
+    const moleculesConfig = {
+      startBurst: isMobile ? 10 : 16,         // стартовый бурст
+      startProgressMax: 0.7,                  // стартовая прогрессия (0..max)
+      spawnMin: isMobile ? 800 : 600,         // интервал между спавнами
+      spawnMax: isMobile ? 1600 : 1400,
+      scaleMin: isMobile ? 0.5 : 0.7,         // размер молекул
+      scaleMax: isMobile ? 1.7 : 2.0,
+      durationMin: isMobile ? 8000 : 9000,    // длительность полёта
+      durationMax: isMobile ? 16000 : 18000,
+      blurMin: 1.5,                           // минимум blur
+      blurMax: isMobile ? 4 : 4.5             // максимум blur
+    };
 
-      if (moleculesLayer) {
-        function createMoleculeSVG(scale) {
-          const size = 80;
-          return `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${size * scale}" height="${size * scale}">
-              <line x1="50" y1="65" x2="28" y2="35"
-                    stroke="#b8b8b8" stroke-width="6" stroke-linecap="round"/>
-              <line x1="50" y1="65" x2="72" y2="35"
-                    stroke="#b8b8b8" stroke-width="6" stroke-linecap="round"/>
-              <circle cx="28" cy="35" r="9" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/>
-              <circle cx="72" cy="35" r="9" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/>
-              <circle cx="50" cy="65" r="14" fill="#ff4444"/>
-            </svg>
-          `;
+    let spawnActive = false;                  // флаг — сейчас спавнить новые или нет
+
+    function createMoleculeSVG(scale) {
+      const size = 80;
+      return `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${size * scale}" height="${size * scale}">
+          <line x1="50" y1="65" x2="28" y2="35"
+                stroke="#b8b8b8" stroke-width="6" stroke-linecap="round"/>
+          <line x1="50" y1="65" x2="72" y2="35"
+                stroke="#b8b8b8" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="28" cy="35" r="9" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/>
+          <circle cx="72" cy="35" r="9" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/>
+          <circle cx="50" cy="65" r="14" fill="#ff4444"/>
+        </svg>
+      `;
+    }
+
+    function spawnMolecule(initialProgress = 0) {
+      const c = moleculesConfig;
+
+      const scale       = c.scaleMin + Math.random() * (c.scaleMax - c.scaleMin);
+      const startX      = window.innerWidth  + 120;
+      const startY      = -120 - Math.random() * 100;
+      const endX        = -200 - Math.random() * 150;
+      const endY        = window.innerHeight + 200 + Math.random() * 150;
+      const duration    = c.durationMin + Math.random() * (c.durationMax - c.durationMin);
+      const blur        = c.blurMin + Math.random() * (c.blurMax - c.blurMin);
+      const rotation    = (Math.random() - 0.5) * 40;
+      const opacityMax  = 0.5 + Math.random() * 0.4;
+      const spinSpeed   = (Math.random() - 0.5) * 60;
+      const twistAxis   = Math.random() < 0.5 ? 'X' : 'Y';
+      const twistAngle  = (40 + Math.random() * 120) * (Math.random() < 0.5 ? 1 : -1);
+      const twistAt     = 0.25 + Math.random() * 0.5;
+
+      const el = document.createElement('div');
+      el.className = 'floating-molecule';
+      el.style.left = '0';
+      el.style.top = '0';
+      el.innerHTML = createMoleculeSVG(scale);
+      floatingMoleculesLayer.appendChild(el);
+
+      el.style.transform = `translate(${startX}px, ${startY}px) rotate(${rotation}deg)`;
+      el.style.filter = `blur(${blur}px)`;
+
+      const startTime = performance.now() - initialProgress * duration;
+
+      function step(now) {
+        const rawT = Math.min(1, (now - startTime) / duration);
+        const eased = rawT * rawT * (3 - 2 * rawT);
+
+        const cx = startX + (endX - startX) * eased;
+        const cy = startY + (endY - startY) * eased;
+
+        const sway = Math.sin(rawT * Math.PI * 6) * 20;
+
+        let twist = 0;
+        const twistRange = 0.12;
+        if (rawT > twistAt - twistRange && rawT < twistAt + twistRange) {
+          const localT = (rawT - (twistAt - twistRange)) / (twistRange * 2);
+          twist = Math.sin(localT * Math.PI) * twistAngle;
         }
 
-        // 🆕 initialProgress — с какого места пути молекула начинает (0..1)
-        function spawnMolecule(initialProgress = 0) {
-          const scale       = 0.5 + Math.random() * 1.2;
-          const startX      = window.innerWidth  + 120;
-          const startY      = -120 - Math.random() * 100;
-          const endX        = -200 - Math.random() * 150;
-          const endY        = window.innerHeight + 200 + Math.random() * 150;
-          const duration    = 8000 + Math.random() * 8000;
-          const blur        = 1.5 + Math.random() * 2.5;
-          const rotation    = (Math.random() - 0.5) * 40;
-          const opacityMax  = 0.5 + Math.random() * 0.4;
-          const spinSpeed   = (Math.random() - 0.5) * 60;
-          const twistAxis   = Math.random() < 0.5 ? 'X' : 'Y';
-          const twistAngle  = (40 + Math.random() * 120) * (Math.random() < 0.5 ? 1 : -1);
-          const twistAt     = 0.25 + Math.random() * 0.5;
+        let alpha;
+        if (rawT < 0.1) alpha = rawT / 0.1;
+        else if (rawT > 0.85) alpha = (1 - rawT) / 0.15;
+        else alpha = 1;
+        alpha *= opacityMax;
 
-          const el = document.createElement('div');
-          el.className = 'floating-molecule';
-          el.style.left = '0';
-          el.style.top = '0';
-          el.innerHTML = createMoleculeSVG(scale);
-          moleculesLayer.appendChild(el);
+        const twistTransform =
+          twistAxis === 'X'
+            ? `rotateX(${twist}deg)`
+            : `rotateY(${twist}deg)`;
 
-          el.style.transform = `translate(${startX}px, ${startY}px) rotate(${rotation}deg)`;
-          el.style.filter = `blur(${blur}px)`;
+        const currentRotation = rotation + sway * 0.3 + spinSpeed * (rawT * duration / 1000);
 
-          // 🆕 сдвиг стартового времени на initialProgress * duration,
-          //    чтобы часть молекул "уже летела"
-          const startTime = performance.now() - initialProgress * duration;
+        el.style.transform =
+          `translate(${cx + sway}px, ${cy}px) ` +
+          `rotate(${currentRotation}deg) ` +
+          `${twistTransform}`;
+        el.style.opacity = alpha;
 
-          function step(now) {
-            const rawT = Math.min(1, (now - startTime) / duration);
-            const eased = rawT * rawT * (3 - 2 * rawT);
-
-            const cx = startX + (endX - startX) * eased;
-            const cy = startY + (endY - startY) * eased;
-
-            const sway = Math.sin(rawT * Math.PI * 6) * 20;
-
-            let twist = 0;
-            const twistRange = 0.12;
-            if (rawT > twistAt - twistRange && rawT < twistAt + twistRange) {
-              const localT = (rawT - (twistAt - twistRange)) / (twistRange * 2);
-              twist = Math.sin(localT * Math.PI) * twistAngle;
-            }
-
-            let alpha;
-            if (rawT < 0.1) alpha = rawT / 0.1;
-            else if (rawT > 0.85) alpha = (1 - rawT) / 0.15;
-            else alpha = 1;
-            alpha *= opacityMax;
-
-            const twistTransform =
-              twistAxis === 'X'
-                ? `rotateX(${twist}deg)`
-                : `rotateY(${twist}deg)`;
-
-            const currentRotation = rotation + sway * 0.3 + spinSpeed * (rawT * duration / 1000);
-
-            el.style.transform =
-              `translate(${cx + sway}px, ${cy}px) ` +
-              `rotate(${currentRotation}deg) ` +
-              `${twistTransform}`;
-            el.style.opacity = alpha;
-
-            if (rawT < 1) {
-              requestAnimationFrame(step);
-            } else {
-              el.remove();
-            }
-          }
-
+        if (rawT < 1) {
           requestAnimationFrame(step);
+        } else {
+          el.remove();
         }
-
-        // 🆕 Стартовый бурст + плавный спавн
-        let isFirstSpawn = true;
-
-        function loopSpawn() {
-          if (isFirstSpawn) {
-            // Стартовый бурст — сразу 10 молекул, распределённых по пути
-            for (let i = 0; i < 10; i++) {
-              const progress = Math.random() * 0.7;
-              spawnMolecule(progress);
-            }
-            isFirstSpawn = false;
-          } else {
-            spawnMolecule();
-          }
-
-          const nextDelay = 800 + Math.random() * 800;   // 0.8–1.6s
-          setTimeout(loopSpawn, nextDelay);
-        }
-
-        loopSpawn();
       }
+
+      requestAnimationFrame(step);
+    }
+
+    let isFirstSpawn = true;
+
+    function loopSpawn() {
+      if (!spawnActive) return;  // если спавн остановлен — выходим
+
+      if (isFirstSpawn) {
+        for (let i = 0; i < moleculesConfig.startBurst; i++) {
+          const progress = Math.random() * moleculesConfig.startProgressMax;
+          spawnMolecule(progress);
+        }
+        isFirstSpawn = false;
+      } else {
+        spawnMolecule();
+      }
+
+      const nextDelay = moleculesConfig.spawnMin + Math.random() * (moleculesConfig.spawnMax - moleculesConfig.spawnMin);
+      setTimeout(() => {
+        if (spawnActive) loopSpawn();
+      }, nextDelay);
     }
 
     // ============================================================
@@ -1585,8 +1589,11 @@
 
       setTimeout(() => { loader.classList.add('hide'); }, 1200);
 
+      // 🆕 Старт молекул вместе с первым текстом
       setTimeout(() => {
         text1.classList.add('show');
+        spawnActive = true;
+        loopSpawn();
       }, 1450);
 
       setTimeout(() => {
@@ -1600,8 +1607,10 @@
         text2.classList.add('hide');
       }, 3800);
 
+      // 🆕 Показ объектов — прекращаем спавн новых молекул
       setTimeout(() => {
         topbar.classList.add('show');
+        spawnActive = false;   // 🛑 новые молекулы больше не создаются
         if (isMobile) {
           mobileContent.classList.add('show');
         } else {
@@ -1621,6 +1630,12 @@
           if (desktopTeacherPhoto) desktopTeacherPhoto.classList.add('show');
         }
       }, 100);
+
+      // Если интро пропущено — запускаем молекулы на 200ms
+      setTimeout(() => {
+        spawnActive = true;
+        loopSpawn();
+      }, 200);
     }
 
     let mouseX = -9999;
