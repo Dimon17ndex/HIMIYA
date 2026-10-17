@@ -1456,12 +1456,8 @@
     const desktopTeacherPhoto  = document.querySelector('.desktop-teacher-photo');
 
     // ============================================================
-    // 🧪 ПЛАВАЮЩИЕ МОЛЕКУЛЫ H₂O — инициализируем, но не запускаем
+    // 🧪 ПЛАВАЮЩИЕ МОЛЕКУЛЫ H₂O — инициализируем и запускаем сразу
     // ============================================================
-    let spawnMoleculeFn = null;
-    let burstMoleculesFn = null;
-    let loopSpawnFn = null;
-
     if (isMobile) {
       const moleculesLayer = document.getElementById('mobileMolecules');
 
@@ -1561,15 +1557,8 @@
           setTimeout(loopSpawn, nextDelay);
         }
 
-        function burstMolecules(count) {
-          for (let i = 0; i < count; i++) {
-            setTimeout(() => spawnMolecule(), i * 120);
-          }
-        }
-
-        spawnMoleculeFn = spawnMolecule;
-        burstMoleculesFn = burstMolecules;
-        loopSpawnFn = loopSpawn;
+        // 🆕 Запускаем сразу — молекулы летят уже во время лоадера
+        loopSpawn();
       }
     }
 
@@ -1583,18 +1572,14 @@
 
       setTimeout(() => { loader.classList.add('hide'); }, 1200);
 
-      // 🆕 При появлении первого текста — бурст молекул + старт постоянного спавна
       setTimeout(() => {
         text1.classList.add('show');
-        if (burstMoleculesFn) burstMoleculesFn(6);
-        if (loopSpawnFn) loopSpawnFn();
       }, 1450);
 
       setTimeout(() => {
         text1.classList.remove('show');
         text1.classList.add('blur-out');
         text2.classList.add('show');
-        if (burstMoleculesFn) burstMoleculesFn(6);
       }, 2600);
 
       setTimeout(() => {
@@ -1623,11 +1608,6 @@
           if (desktopTeacherPhoto) desktopTeacherPhoto.classList.add('show');
         }
       }, 100);
-
-      // 🆕 Если интро пропущено — запускаем молекулы сразу
-      setTimeout(() => {
-        if (loopSpawnFn) loopSpawnFn();
-      }, 200);
     }
 
     let mouseX = -9999;
